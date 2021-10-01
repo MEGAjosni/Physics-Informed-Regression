@@ -32,7 +32,7 @@ gamma = 0.08 #rate of recovery
 stepsize = 0.1 #stepsize in Runge-Kutta iteration
 
 
-##### real or synthetic ####
+##### real or synthetic data used #############
 syn = False
 
 ############ Which parameters to find ####################################
