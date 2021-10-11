@@ -27,8 +27,9 @@ def SIR_params_OLS(
     
     
     if normalised:
-        X = (X-X.mean(axis=0))/X.var(axis=0)
-    dX = X[1:,:]-X[:-1,:]
+        X = (X-X.mean(axis=0))/X.std(axis=0)
+    #dX = X[1:,:]-X[:-1,:]
+    dX = np.gradient(X,axis=0)
     N = sum(X[0,:])
 
     
