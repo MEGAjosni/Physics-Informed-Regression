@@ -92,7 +92,8 @@ def SIRdataframe(
         dataframe,
         pop = True,
         gamma = 7,
-        dark_number_scalar = 1
+        dark_number_scalar = 1,
+        standardize = False
         ):
     
     # Import relevant packages
@@ -112,5 +113,9 @@ def SIRdataframe(
     SIR_data['S'] = N - (dataframe['New_cases'].cumsum() * dark_number_scalar)
     SIR_data['I'] = dataframe['New_cases'].rolling(min_periods=1, window=gamma).sum().astype('int64') * dark_number_scalar
     SIR_data['R'] = N - (SIR_data['S'] + SIR_data['I'])
-      
+     
+    if standardize:
+        SIR_data = (SIR_data - SIR_data.mean())/SIR_data.std()
+    
     return SIR_data
+    
