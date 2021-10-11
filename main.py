@@ -29,6 +29,7 @@ X = (X[["S","I","R"]][pd.to_datetime(start_date):pd.to_datetime(start_date)+ + d
 X_0 = [10000, 30, 0] #initial conditions
 beta= 0.23  #rate of transmission
 gamma = 0.08 #rate of recovery
+noise_var = 0.01 #variance of added noise
 stepsize = 0.1 #stepsize in Runge-Kutta iteration
 
 
@@ -37,11 +38,11 @@ syn = False
 
 ############ Which parameters to find ####################################
 pass_beta = None #"None" if you need a beta estimation, otherwise put a "beta" value
-pass_gamma = None #"None" if you need a gamma estimation, otherwise put a "gamma" value
+pass_gamma = gamma #"None" if you need a gamma estimation, otherwise put a "gamma" value
 
 ############ Real time estimations ################################
 over_time = True #set "True" if estimations are needed in real time
-overshoot = 14 #the amount of previous days included for parameter estimations in real time
+overshoot = 7 #the amount of previous days included for parameter estimations in real time
 
 
 #### plots ##############
@@ -121,5 +122,5 @@ if over_time and include_params:
         ax2.plot(T,beta*np.ones(len(T)),"--",c = "r")
         ax2.plot(T,gamma*np.ones(len(T)),"--",c = "tab:purple")
     ax2.set_ylim(0,0.30)
-    ax2.legend(["b est","g true","b true", "g true"],loc = "upper right")
+    ax2.legend(["b est","g est","b true", "g true"],loc = "upper right")
 
