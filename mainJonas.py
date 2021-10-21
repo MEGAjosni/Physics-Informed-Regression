@@ -12,12 +12,22 @@ from data_functions import ReadDataFromCsvFile, ExtractContries, SIRdataframe
 
 data, attribute_dict, date_dict, country_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_country.csv")
 
-dataDK = ExtractContries(data, 'Denmark', country_dict)
+dataDK = ExtractContries(data, 'Sweden', country_dict)
 
-SIRdata = SIRdataframe(dataDK, dark_number_scalar = 10)
+SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=True)
 
 fig = px.line(SIRdata)
 fig.show()
 
+nordic = ['Denmark', 'Sweden', 'Norway']
 
-dataNord = ExtractContries(data, ['Denmark', 'Sweden', 'Norway'], country_dict)
+nordDict = ExtractContries(data, nordic, country_dict)
+
+nordData = []
+for df in nordDict.values():
+    nordData += [SIRdataframe(df, standardize=True)]
+
+nordData = sum(nordData)
+
+fig = px.line(nordData)
+fig.show()

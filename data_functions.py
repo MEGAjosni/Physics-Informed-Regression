@@ -1,4 +1,4 @@
-    
+
 def DownloadData(
         url = 'https://covid19.who.int/WHO-COVID-19-global-data.csv',
         save_dir = ''
@@ -21,7 +21,7 @@ def DownloadData(
     r = requests.get(url, allow_redirects=True)
     url_content = r.content
     open('Covid19_data_daily_by_country.csv', 'wb').write(url_content)
-    
+
     return
 
 
