@@ -1,0 +1,249 @@
+Number,Alpha2Code,Alpha3Code,CountryName,TopLevelDomain
+20,AD,AND,Andorra,.ad
+4,AF,AFG,Afghanistan,.af
+28,AG,ATG,Antigua and Barbuda,.ag
+660,AI,AIA,Anguilla,.ai
+8,AL,ALB,Albania,.al
+51,AM,ARM,Armenia,.am
+24,AO,AGO,Angola,.ao
+10,AQ,ATA,Antarctica,.aq
+32,AR,ARG,Argentina,.ar
+16,AS,ASM,American Samoa,.as
+36,AU,AUS,Australia,.au
+553,AW,ABW,Aruba,.aw
+248,AX,ALA,Åland Islands,.ax
+31,AZ,AZE,Azerbaijan,.az
+40,AT,AUT,Austria,.at
+12,DZ,DZA,Algeria,.dz
+44,BS,BHS,Bahamas,.bs
+48,BH,BHR,Bahrain,.bh
+50,BD,BGD,Bangladesh,.bd
+52,BB,BRB,Barbados,.bb
+112,BY,BLR,Belarus,.by
+56,BE,BEL,Belgium,.be
+84,BZ,BLZ,Belize,.bz
+204,BJ,BEN,Benin,.bj
+60,BM,BMU,Bermuda,.bm
+64,BT,BTN,Bhutan,.bt
+68,BO,BOL,Plurinational State of Bolivia,.bo
+535,BQ,BES,Sint Eustatius and Saba Bonaire,.bq
+70,BA,BIH,Bosnia and Herzegowina,.ba
+72,BW,BWA,Botswana,.bw
+74,BV,BVT,Bouvet Island,.no
+76,BR,BRA,Brazil,.br
+86,IO,IOT,British Indian Ocean Territory,.io
+96,BN,BRN,Brunei Darussalam,.bn
+100,BG,BGR,Bulgaria,.bg
+854,BF,BFA,Burkina Faso,.bf
+108,BI,BDI,Burundi,.bi
+116,KH,KHM,Cambodia,.kh
+120,CM,CMR,Cameroon,.cm
+124,CA,CAN,Canada,.ca
+132,CV,CPV,Cape Verde,.cv
+136,KY,CYM,Cayman Islands,.ky
+140,CF,CAF,Central African Republic,.cf
+148,TD,TCD,Chad,.td
+152,CL,CHL,Chile,.cl
+156,CN,CHN,China,.cn
+162,CX,CXR,Christmas Island,.cx
+166,CC,CCK,Cocos  Islands,.cc
+170,CO,COL,Colombia,.co
+174,KM,COM,Comoros,.km
+178,CG,COG,Congo,.cg
+180,CD,COD,The Democratic Republic of The Congo,.cd
+184,CK,COK,Cook Islands,.ck
+188,CR,CRI,Costa Rica,.cr
+384,CI,CIV,Côte d'Ivoire,.ci
+191,HR,HRV,Croatia ,.hr
+192,CU,CUB,Cuba,.cu
+531,CW,CUW,Curaçao,.cw
+196,CY,CYP,Cyprus,.cy
+203,CZ,CZE,Czech Republic,.cz
+208,DK,DNK,Denmark,.dk
+262,DJ,DJI,Djibouti,.dj
+212,DM,DMA,Dominica,.dm
+214,DO,DOM,Dominican Republic,.do
+218,EC,ECU,Ecuador,.ec
+818,EG,EGY,Egypt,.eg
+222,SV,SLV,El Salvador,.sv
+226,GQ,GNQ,Equatorial Guinea,.gq
+232,ER,ERI,Eritrea,.er
+233,EE,EST,Estonia,.ee
+231,ET,ETH,Ethiopia,.et
+238,FK,FLK,Falkland Islands ,.fk
+234,FO,FRO,Faroe Islands,.fo
+242,FJ,FJI,Fiji,.fj
+246,FI,FIN,Finland,.fi
+250,FR,FRA,France,.fr
+254,GF,GUF,French Guiana,.gf
+258,PF,PYF,French Polynesia,.pf
+260,TF,ATF,French Southern Territories,.tf
+266,GA,GAB,Gabon,.ga
+270,GM,GMB,Gambia,.gm
+268,GE,GEO,Georgia,.ge
+276,DE,DEU,Germany,.de
+288,GH,GHA,Ghana,.gh
+292,GI,GIB,Gibraltar,.gi
+300,GR,GRC,Greece,.gr
+304,GL,GRL,Greenland,.gl
+308,GD,GRD,Grenada,.gd
+312,GP,GLP,Guadeloupe,.gp
+316,GU,GUM,Guam,.gu
+320,GT,GTM,Guatemala,.gt
+831,GG,GGY,Guernsey,.gg
+324,GN,GIN,Guinea,.gn
+624,GW,GNB,Guinea-bissau,.gw
+328,GY,GUY,Guyana,.gy
+332,HT,HTI,Haiti,.ht
+334,HM,HMD,Heard and McDonald Islands,.hm
+336,VA,VAT,Holy See ,.va
+340,HN,HND,Honduras,.hn
+344,HK,HKG,Hong Kong,.hk
+348,HU,HUN,Hungary,.hu
+352,IS,ISL,Iceland,.is
+356,IN,IND,India,.in
+360,ID,IDN,Indonesia,.id
+364,IR,IRN,Iran ,.ir
+368,IQ,IRQ,Iraq,.iq
+372,IE,IRL,Ireland,.ie
+833,IM,IMN,Isle of Man,.im
+376,IL,ISR,Israel,.il
+380,IT,ITA,Italy,.it
+388,JM,JAM,Jamaica,.jm
+392,JP,JPN,Japan,.jp
+832,JE,JEY,Jersey,.je
+400,JO,JOR,Jordan,.jo
+398,KZ,KAZ,Kazakhstan,.kz
+404,KE,KEN,Kenya,.ke
+296,KI,KIR,Kiribati,.ki
+408,KP,PRK,Democratic People's Republic of Korea,.kp
+410,KR,KOR,Republic of Korea,.kr
+414,KW,KWT,Kuwait,.kw
+417,KG,KGZ,Kyrgyzstan,.kg
+418,LA,LAO,Lao People's Democratic Republic,.la
+428,LV,LVA,Latvia,.lv
+422,LB,LBN,Lebanon,.lb
+426,LS,LSO,Lesotho,.ls
+430,LR,LBR,Liberia,.lr
+434,LY,LBY,Libya,.ly
+438,LI,LIE,Liechtenstein,.li
+440,LT,LTU,Lithuania,.lt
+442,LU,LUX,Luxembourg,.lu
+446,MO,MAC,Macao,.mo
+807,MK,MKD,The Former Yugoslav Republic of Macedonia,.mk
+450,MG,MDG,Madagascar,.mg
+454,MW,MWI,Malawi,.mw
+458,MY,MYS,Malaysia,.my
+462,MV,MDV,Maldives,.mv
+466,ML,MLI,Mali,.ml
+470,MT,MLT,Malta,.mt
+485,MH,MHL,Marshall Islands,.mh
+474,MQ,MTQ,Martinique,.mq
+478,MR,MRT,Mauritania,.mr
+480,MU,MUS,Mauritius,.mu
+175,YT,MYT,Mayotte,.yt
+484,MX,MEX,Mexico,.mx
+583,FM,FSM,Federated States of Micronesia,.fm
+498,MD,MDA,Republic of Moldova,.md
+492,MC,MCO,Monaco,.mc
+496,MN,MNG,Mongolia,.mn
+499,ME,MNE,Montenegro,.me
+500,MS,MSR,Montserrat,.ms
+504,MA,MAR,Morocco,.ma
+508,MZ,MOZ,Mozambique,.mz
+104,MM,MMR,Myanmar,.mm
+516,NA,NAM,Namibia,.na
+520,NR,NRU,Nauru,.nr
+524,NP,NPL,Nepal,.np
+528,NL,NLD,Netherlands,.nl
+540,NC,NCL,New Caledonia,.nc
+554,NZ,NZL,New Zealand,.nz
+558,NI,NIC,Nicaragua,.ni
+562,NE,NER,Niger,.ne
+566,NG,NGA,Nigeria,.ng
+570,NU,NIU,Niue,.nu
+574,NF,NFK,Norfolk Island,.nf
+580,MP,MNP,Northern Mariana Islands,.mp
+578,NO,NOR,Norway,.no
+512,OM,OMN,Oman,.om
+586,PK,PAK,Pakistan,.pk
+585,PW,PLW,Palau,.pw
+275,PS,PSE,State of Palestine,.ps
+591,PA,PAN,Panama,.pa
+598,PG,PNG,Papua New Guinea,.pg
+600,PY,PRY,Paraguay,.py
+604,PE,PER,Peru,.pe
+608,PH,PHL,Philippines,.ph
+612,PN,PCN,Pitcairn,.pn
+616,PL,POL,Poland,.pl
+620,PT,PRT,Portugal,.pt
+630,PR,PRI,Puerto Rico,.pr
+634,QA,QAT,Qatar,.qa
+638,RE,REU,Réunion,.re
+642,RO,ROU,Romania,.ro
+643,RU,RUS,Russian Federation,.ru
+646,RW,RWA,Rwanda,.rw
+654,SH,SHN,Ascension and Tristan Da Cunha Saint Helena,.ac
+652,BL,BLM,Saint Barthélemy,.gp
+659,KN,KNA,Saint Kitts and Nevis,.kn
+662,LC,LCA,Saint Lucia,.lc
+666,PM,SPM,Saint Pierre and Miquelon,.pm
+670,VC,VCT,Saint Vincent and The Grenadines,.vc
+882,WS,WSM,Samoa,.ws
+674,SM,SMR,San Marino,.sm
+678,ST,STP,Sao Tome and Principe,.st
+682,SA,SAU,Saudi Arabia,.sa
+686,SN,SEN,Senegal,.sn
+688,RS,SRB,Serbia,.rs
+690,SC,SYC,Seychelles,.sc
+694,SL,SLE,Sierra Leone,.sl
+702,SG,SGP,Singapore,.sg
+534,SX,SXM,Sint Maarten ,.sx
+703,SK,SVK,Slovakia,.sk
+705,SI,SVN,Slovenia,.si
+90,SB,SLB,Solomon Islands,.sb
+706,SO,SOM,Somalia,.so
+710,ZA,ZAF,South Africa,.za
+239,GS,SGS,South Georgia and The South Sandwich Islands,.gs
+728,SS,SSD,South Sudan,.ss
+724,ES,ESP,Spain,.es
+144,LK,LKA,Sri Lanka,.lk
+729,SD,SDN,Sudan,.sd
+740,SR,SUR,Suriname,.sr
+744,SJ,SJM,Svalbard and Jan Mayen Islands,.no
+748,SZ,SWZ,Swaziland,.sz
+752,SE,SWE,Sweden,.se
+756,CH,CHE,Switzerland,.ch
+760,SY,SYR,Syrian Arab Republic,.sy
+158,TW,TWN,Province of China Taiwan,.tw
+762,TJ,TJK,Tajikistan,.tj
+834,TZ,TZA,United Republic of Tanzania,.tz
+764,TH,THA,Thailand,.th
+626,TL,TLS,Timor-leste,.tl
+768,TG,TGO,Togo,.tg
+772,TK,TKL,Tokelau,.tk
+776,TO,TON,Tonga,.to
+780,TT,TTO,Trinidad and Tobago,.tt
+788,TN,TUN,Tunisia,.tn
+792,TR,TUR,Turkey,.tr
+795,TM,TKM,Turkmenistan,.tm
+796,TC,TCA,Turks and Caicos Islands,.tc
+798,TV,TUV,Tuvalu,.tv
+800,UG,UGA,Uganda,.ug
+804,UA,UKR,Ukraine,.ua
+784,AE,ARE,United Arab Emirates,.ae
+826,GB,GBR,United Kingdom,.uk
+840,US,USA,United States,.us
+581,UM,UMI,United States Minor Outlying Islands,.um
+858,UY,URY,Uruguay,.uy
+860,UZ,UZB,Uzbekistan,.uz
+548,VU,VUT,Vanuatu,.vu
+862,VE,VEN,Bolivarian Republic of Venezuela,.ve
+704,VN,VNM,Vietnam,.vn
+92,VG,VGB,Virgin Islands (British),.vg
+850,VI,VIR,Virgin Islands (US),.vi
+876,WF,WLF,Wallis and Futuna Islands,.wf
+732,EH,ESH,Western Sahara,.eh
+887,YE,YEM,Yemen,.ye
+894,ZM,ZMB,Zambia,.zm
+716,ZW,ZWE,Zimbabwe,.zw

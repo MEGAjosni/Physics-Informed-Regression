@@ -29,58 +29,79 @@ def ReadDataFromCsvFile(
         file_path,
         ):
     
-    # Import relevant packages
+    import os
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+    
     import pandas as pd
     
-    # Read csv file into pandas dataframe
-    data = pd.read_csv(file_path)
-
-    # >>> Data preperation <<<
-    attribute_names = data.columns
-    attribute_dict = dict(zip(attribute_names, range(len(attribute_names))))
+    data = pd.read_csv('Covid19_data_daily_by_country.csv')
     
-    # --- Special cases ---
-    # The countrycode of Namibia is missing, and is set to NA.
-    data['Country_code'].fillna('NA', inplace=True)
-    
-    # The observations without a country accounts for a total of only 764 new positives, hence it is removed
-    data = data[data['Country'] != 'Other']
-    
-    # Country and country codes is essentially the same, thus they are paired and their columns replaced by a single column with integer keys (If one wanted, it could be considered to use actual country codes for more flexibility).
-    countries = set(zip(data['Country_code'], data['Country']))
-    country_dict = dict(zip([val for sublist in countries for val in sublist], [i for i in range(len(countries)) for _ in range(2)]))
-    data = data.drop('Country_code', axis = 1)
+    country_codes = pd.read_csv('country_codes.csv', index_col=0)
+    country_codes.fillna('NA', inplace=True)
+    codes = dict(zip(country_codes['Alpha2Code'].to_numpy(), country_codes.index))
     
     # Enumerate the WHO regions
     WHOregions = list(set(data["WHO_region"]))
     WHOregion_dict = dict(zip(WHOregions, range(len(WHOregions))))
     
     # Enumerate dates
-    dates = sorted(set(data[attribute_names[0]]))
+    dates = sorted(set(data['Date_reported']))
     date_dict = dict(zip(dates, range(len(dates))))
-
-    # Use the constructed dicts to change all string values to integer values - This makes the dataset easily usable with machine learning methods.
-    data.replace({'Country': country_dict, 'Date_reported': date_dict, 'WHO_region': WHOregion_dict}, inplace=True)
-
+    
+    # Fix Namibia being assigned nan due to country code
+    data['Country_code'].fillna('NA', inplace=True)
+    data = data[data['Country'] != 'Other']
+    
+    # Country and country code are essentially the same thing, thus country name is dropped
+    data = data.drop('Country', axis=1)
+    
+    # Countries without a well defined country code are removed
+    data.replace({'Country_code': codes, 'Date_reported': date_dict, 'WHO_region': WHOregion_dict}, inplace=True)
+    
+    data = data[data['Country_code'].apply(lambda x: not isinstance(x, str))]
+    
     # Return the processed dataframe along with the necessary keys.
-    return data, attribute_dict, date_dict, country_dict, WHOregion_dict
+    return data, date_dict, WHOregion_dict
+
+
+def GetCountryCode(
+        key
+        ):
+    
+    import pandas as pd
+    
+    country_codes = pd.read_csv('country_codes.csv', index_col=0)
+    
+    numeric_code = []
+    
+    for code_type in country_codes.columns:
+        numeric_code += country_codes.index[country_codes[code_type] == key].to_list()
+    
+    if len(numeric_code) == 0:
+        print('Warning! No country found using the key:', key)
+        return None
+    elif len(numeric_code) == 1:
+        return numeric_code[0]
+    else:
+        raise(ValueError)
 
 
 def ExtractContries(
         dataframe,
-        countries,
-        country_dict
+        countries
         ):
     
     # Check if only 1 country is specified.
-    if type(countries) == str:
-        return dataframe.loc[dataframe['Country'] == country_dict[countries]].reset_index(drop=True)
+    if type(countries) == int:
+        return dataframe.loc[dataframe['Country_code'] == countries].reset_index(drop=True)
         
     elif type(countries) == list:
         # Prepare return dict
         extracted_countries = dict()
         for country in countries:
-            extracted_countries[country] = dataframe.loc[dataframe['Country'] == country_dict[country]].reset_index(drop=True)
+            extracted_countries[country] = dataframe.loc[dataframe['Country_code'] == country].reset_index(drop=True)
             
         return extracted_countries
     
@@ -119,3 +140,22 @@ def SIRdataframe(
     
     return SIR_data
     
+
+def getPopulation(
+        countries,
+        ):
+    
+    import pandas as pd
+    
+    pop = pd.read_csv('worldpop.csv')
+    pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()
+    
+    if type(countries) == str:
+        return pop_dict[countries]
+    else:    
+        d = dict()
+        
+        for country in countries:
+            d[country] = pop_dict[country]
+    
+        return d
