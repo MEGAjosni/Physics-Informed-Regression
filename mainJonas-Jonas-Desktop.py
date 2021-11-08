@@ -41,13 +41,11 @@ fig = plt.figure()
 ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, A)
 ax.set_title('Surface plot')
-ax.set_xlabel('Beta')
-ax.set_ylabel('Gamma')
 plt.show()
 
 
 
-traindays = 21
+traindays = 14
 
 t = np.arange(traindays)
 SIR = SIRdata.iloc[t]
