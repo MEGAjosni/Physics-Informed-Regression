@@ -150,7 +150,7 @@ def getPopulation(
     pop = pd.read_csv('worldpop.csv')
     pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()
     
-    if type(countries) == str:
+    if type(countries) == int:
         return pop_dict[countries]
     else:    
         d = dict()

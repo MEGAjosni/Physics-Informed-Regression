@@ -24,39 +24,49 @@ country = GetCountryCode('Denmark')
 dataDK = ExtractContries(data, country)
 SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=False)
 
-markday = '2021-05-14'
+markday = '2020-08-14'
 mark = date_dict[markday]
 interval = 7
+project = 14
+sample_days = 14
+gamma = 1/7
 
 betas = np.array([])
 
-ts = np.arange(mark, mark+7)
+ts = np.arange(mark, mark+project)
 
-for i in range(14):
+for i in range(sample_days):
     t = np.arange(mark-interval-i, mark-i)
-    beta = LeastSquareModel(t, SIRdata.iloc[t], model=SIR, fix_params=([0, 1/7]))
+    beta = LeastSquareModel(t, SIRdata.iloc[t], model=SIR, fix_params=([None, gamma]), normalize=True)
     betas = np.append(betas, beta)
     
 mu = np.mean(betas)
 sigma = np.std(betas)
 
-SIRupper = SimulateModel(ts, SIRdata.iloc[mark], [mu - 3*sigma, 1/7])
-SIRlower = SimulateModel(ts, SIRdata.iloc[mark], [mu + 3*sigma, 1/7])
+SIRupper = SimulateModel(ts, SIRdata.iloc[mark], [mu - 3*sigma, gamma])
+SIRlower = SimulateModel(ts, SIRdata.iloc[mark], [mu + 3*sigma, gamma])
 
 plt.plot(ts, SIRlower[:, 1], 'g--')
 plt.plot(ts, SIRupper[:, 1], 'g--', label='_nolegend_')
 # plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='green')
 
-SIRupper = SimulateModel(ts, SIRdata.iloc[mark], [mu - 2*sigma, 1/7])
-SIRlower = SimulateModel(ts, SIRdata.iloc[mark], [mu + 2*sigma, 1/7])
+SIRupper = SimulateModel(ts, SIRdata.iloc[mark], [mu - 2*sigma, gamma])
+SIRlower = SimulateModel(ts, SIRdata.iloc[mark], [mu + 2*sigma, gamma])
 
 plt.plot(ts, SIRlower[:, 1], 'b--')
 plt.plot(ts, SIRupper[:, 1], 'b--', label='_nolegend_')
 # plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='blue', alpha=0.5)
 
+SIRupper = SimulateModel(ts, SIRdata.iloc[mark], [mu - 1*sigma, gamma])
+SIRlower = SimulateModel(ts, SIRdata.iloc[mark], [mu + 1*sigma, gamma])
+
+plt.plot(ts, SIRlower[:, 1], 'm--')
+plt.plot(ts, SIRupper[:, 1], 'm--', label='_nolegend_')
+# plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='blue', alpha=0.5)
+
 plt.plot(ts, SIRdata.iloc[ts]['I'], 'rx')
-plt.legend(['99.7% Confidence Interval','95% Confidence Interval','Observed Infected'])
-plt.title('Projecting ' + str(interval) + ' days forward from ' + markday)
-tikzplotlib.save("graphix/test.tex")
+plt.legend(['99.7% Confidence Interval','95% Confidence Interval','68.2% Confidence Interval','Observed Infected'])
+plt.title('Projecting ' + str(project) + ' days forward from ' + markday)
+tikzplotlib.save("graphix/20200814.tex")
 
 plt.show()

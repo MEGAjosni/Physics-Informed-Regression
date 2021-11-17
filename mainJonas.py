@@ -27,7 +27,7 @@ for i in range(1, 11):
     for j in range(1, 11):
         mp_used = np.array([i/10, j/10])
         SIR = SimulateModel(t, [5600000, 100000, 0], mp_used)
-        mp = LeastSquareModel(t, SIR)
+        mp = LeastSquareModel(t, SIR, normalize=True)
         A[i-1, j-1] = np.mean(1 - mp/mp_used)
 
     print(i)

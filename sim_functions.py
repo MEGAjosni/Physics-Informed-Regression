@@ -40,7 +40,7 @@ def SimulateModel(t, x0, mp, model=SIR):
     return sol.y.T
 
 
-def LeastSquareModel(t, data, model=SIR, fix_params = None):
+def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
     '''
     Description
     -----------
@@ -72,22 +72,34 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
     
     # Get number of parameters
     k = model(0, data[0], 0, matrix=True).shape[1]
-    
+
     # Initialize array
     A = np.zeros((m*n, k))
 
-    y = gradient.flatten()
-
-    for i, state in enumerate(data):
-        A[i*n:(i+1)*n, :] = model(0, state, 0, matrix=True)
+    if normalize:
+        # Normalize equations
+        std = np.std(gradient, axis=0)
+        std[np.where(std == 0)] = 1
+        gradient = gradient / std
+        for i, state in enumerate(data):
+            A[i*n:(i+1)*n, :] = np.array(model(0, state, 0, matrix=True)) * (1/std.reshape((n,1)))
+    else:
+        for i, state in enumerate(data):
+            A[i*n:(i+1)*n, :] = np.array(model(0, state, 0, matrix=True))
     
+    # Create right hand side
+    y = gradient.flatten()
+        
     if fix_params is not None:
         if len(fix_params) == k:
             for i in range(len(fix_params)):
-                if fix_params[i] != 0:
+                if fix_params[i] is not None:
                     y -= fix_params[i] * A[:, i]
             
-            A = np.delete(A, np.nonzero(fix_params), axis = 1)
+            A = np.delete(A, np.where(np.array(fix_params) != None)[0], axis = 1)
+        else:
+            print('Warning! Ignoring input >fix_params< due to mismatched dimensions.')
+    
     
     mp_est = np.linalg.lstsq(A, y, rcond=None)[0]
     
