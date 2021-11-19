@@ -1,3 +1,4 @@
+# Set cwd to file dirand import relevant packages
 import os
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -11,7 +12,6 @@ pio.renderers.default = "browser" # This set the default render as browser (This
 import numpy as np
 from data_functions import ReadDataFromCsvFile, ExtractContries, SIRdataframe, getPopulation, GetCountryCode, DownloadData
 from sim_functions import LeastSquareModel, SimulateModel
-
 
 data, date_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_country.csv")
 country = GetCountryCode('Denmark')

@@ -108,11 +108,11 @@ def ExtractContries(
     else:
         raise(ValueError)
     
-
+    
 def SIRdataframe(
         dataframe,
         N,
-        gamma = 9,
+        gamma = 1/9,
         dark_number_scalar = 1,
         standardize = False
         ):
@@ -125,7 +125,7 @@ def SIRdataframe(
     
     # Compute compartments
     SIR_data['S'] = N - (dataframe['New_cases'].cumsum() * dark_number_scalar)
-    SIR_data['I'] = dataframe['New_cases'].rolling(min_periods=1, window=gamma).sum().astype('int64') * dark_number_scalar
+    SIR_data['I'] = dataframe['New_cases'].rolling(min_periods=1, window=int(1/gamma)).sum().astype('int64') * dark_number_scalar
     SIR_data['R'] = N - (SIR_data['S'] + SIR_data['I'])
      
     if standardize:
@@ -139,6 +139,8 @@ def getPopulation(
         ):
     
     import pandas as pd
+    
+    print('>>>>> Warning: The validity of the getPopulation function is questionable! <<<<<')
     
     pop = pd.read_csv('worldpop.csv')
     pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()

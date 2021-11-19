@@ -1,3 +1,4 @@
+# Set cwd to file dirand import relevant packages
 import os
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -16,7 +17,7 @@ from sim_functions import LeastSquareModel, SimulateModel
 data, date_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_country.csv")
 country = GetCountryCode('Denmark')
 dataDK = ExtractContries(data, country)
-SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=False)
+SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=False)
 
 
 t = np.arange(10)
