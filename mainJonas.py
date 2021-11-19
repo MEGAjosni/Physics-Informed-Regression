@@ -17,7 +17,11 @@ from sim_functions import LeastSquareModel, SimulateModel
 data, date_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_country.csv")
 country = GetCountryCode('Denmark')
 dataDK = ExtractContries(data, country)
+<<<<<<< Updated upstream
 SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=False)
+=======
+SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=False)
+>>>>>>> Stashed changes
 
 
 t = np.arange(10)
@@ -28,7 +32,11 @@ for i in range(1, 11):
     for j in range(1, 11):
         mp_used = np.array([i/10, j/10])
         SIR = SimulateModel(t, [5600000, 100000, 0], mp_used)
+<<<<<<< Updated upstream
         mp = LeastSquareModel(t, SIR, normalize=True)
+=======
+        mp = LeastSquareModel(t, SIR)
+>>>>>>> Stashed changes
         A[i-1, j-1] = np.mean(1 - mp/mp_used)
 
     print(i)
@@ -42,13 +50,20 @@ fig = plt.figure()
 ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, A)
 ax.set_title('Surface plot')
+<<<<<<< Updated upstream
 ax.set_xlabel('Beta')
 ax.set_ylabel('Gamma')
+=======
+>>>>>>> Stashed changes
 plt.show()
 
 
 
+<<<<<<< Updated upstream
 traindays = 21
+=======
+traindays = 7
+>>>>>>> Stashed changes
 
 t = np.arange(traindays)
 SIR = SIRdata.iloc[t]
