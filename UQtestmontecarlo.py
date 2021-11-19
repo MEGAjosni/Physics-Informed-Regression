@@ -39,7 +39,7 @@ t0 = date_dict[t0]
 betas = np.array([])
 for i in range(T_samp):
     t = np.arange(t0-T_train-i, t0-i)
-    beta = LeastSquareModel(t, SIRdata.iloc[t], model=SIR, fix_params=[None, gamma], normalize=True)
+    beta = LeastSquareModel(t, SIRdata.iloc[t], model=SIR, fix_params=[[1, gamma]], normalize=True)
     betas = np.append(betas, beta)
     
 mu = np.mean(betas)

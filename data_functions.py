@@ -140,25 +140,17 @@ def getPopulation(
     
     import pandas as pd
     
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
     print('>>>>> Warning: The validity of the getPopulation function is questionable! <<<<<')
     
     pop = pd.read_csv('worldpop.csv')
     pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()
     
     if type(countries) == int:
-=======
-=======
->>>>>>> Stashed changes
-    pop = pd.read_csv('worldpop.csv')
-    pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()
-    
+        pop = pd.read_csv('worldpop.csv')
+        pop_dict = pd.Series(pop['population'].values,index=pop['country']).to_dict()
+        
     if type(countries) == str:
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         return pop_dict[countries]
     else:    
         d = dict()

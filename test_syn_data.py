@@ -74,7 +74,7 @@ plt.show()
 x0 = [5700000, 100000, 0, 10000000, 300000, 0, 5300000, 50000, 0]   # Initial state.
 mp = [0.2, 0.05, 0.05, 0.05, 0.3, 0.05, 0.05, 0.05, 0.2, 1/9]       # Model parameters.
 T_sim = 100                                                         # Number of time steps that should be simulated.
-T_train = 50                                                         # Model trained on the first T_train time steps.
+T_train = 14                                                        # Model trained on the first T_train time steps.
 # ----------------------------------------------------------------------------------------------------
 
 # Generate synthetic data

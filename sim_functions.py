@@ -40,15 +40,8 @@ def SimulateModel(t, x0, mp, model=SIR):
     return sol.y.T
 
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
-=======
-def LeastSquareModel(t, data, model=SIR, fix_params = None):
->>>>>>> Stashed changes
-=======
-def LeastSquareModel(t, data, model=SIR, fix_params = None):
->>>>>>> Stashed changes
+
     '''
     Description
     -----------
@@ -73,7 +66,6 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
 
     '''
     
-    
     # Convert to numpy and estimate gradient
     data = np.array(data)
     gradient = np.gradient(data, t, axis=0)
@@ -87,8 +79,6 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
     # Initialize array
     A = np.zeros((m*n, k))
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     if normalize:
         # Normalize equations
         std = np.std(gradient, axis=0)
@@ -102,25 +92,6 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
     
     # Create right hand side
     y = gradient.flatten()
-=======
-=======
->>>>>>> Stashed changes
-    y = gradient.flatten()
-
-    for i, state in enumerate(data):
-        A[i*n:(i+1)*n, :] = model(0, state, 0, matrix=True)
-    
-    if fix_params is not None:
-        if len(fix_params) == k:
-            for i in range(len(fix_params)):
-                if fix_params[i] != 0:
-                    y -= fix_params[i] * A[:, i]
-            
-            A = np.delete(A, np.nonzero(fix_params), axis = 1)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     
     # Handle fixed parameters
     if fix_params is not None:
