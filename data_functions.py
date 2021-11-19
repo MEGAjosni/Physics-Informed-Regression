@@ -111,21 +111,14 @@ def ExtractContries(
 
 def SIRdataframe(
         dataframe,
-        pop = True,
-        gamma = 7,
+        N,
+        gamma = 9,
         dark_number_scalar = 1,
         standardize = False
         ):
     
     # Import relevant packages
     import pandas as pd
-    
-    if pop:
-        N = 5600000 # Should be changed to actual populationvalues
-    elif type(pop) == int:
-        N = pop
-    else:
-        raise(ValueError)
         
     SIR_data = pd.DataFrame()
     # SIR_data = pd.DataFrame((dataframe['Date_reported']))

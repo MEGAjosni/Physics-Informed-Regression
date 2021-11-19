@@ -45,6 +45,7 @@ def SIR(t, x, mp, matrix=False):
     
     return dXdt
 
+
 #######################################################
 ###### >>>>> The 7 compartment S3I3R model <<<<< ######
 #######################################################
@@ -93,3 +94,59 @@ def S3I3R(t, x, mp, matrix=False):
     dxdt = np.array(A) @ np.array(mp).T
     
     return dxdt
+
+
+#################################################
+###### >>>>> Scandinaivian SIR model <<<<< ######
+#################################################
+
+def TripleRegionSIR(t, x, mp, matrix=False):
+    '''
+    Parameters
+    ----------
+    t : list
+        Sample times - Only specified by ode solver.
+        Prototype: t = [t1, t2, ..., tn]
+    x : list
+        State of the model.
+        Prototype: x = [S1, I1, R1, S2, I2, R2, S3, I3, R3].
+    mp: list
+        Parameters of the model.
+        Prototype: mp = [beta11, beta12, beta13, beta21, beta22, beta23, beta31, beta32, beta33, gamma].
+    matrix : Boolean, optional
+        If true, returns system matrix. The default is False.
+
+    Returns
+    -------
+    np.array
+        Default, dxdt.
+
+    '''
+    
+    # Compute the total population of each region
+    N = [sum(x[3*i:3*i+3]) for i in range(3)]
+
+    # Construct system matrix from model
+    A = np.array([
+         [-x[0]*x[1]/N[0], -x[0]*x[1]/N[0],   -x[0]*x[1]/N[0], 0, 0, 0, 0, 0, 0, 0],
+         [ x[0]*x[1]/N[0],  x[0]*x[1]/N[0],    x[0]*x[1]/N[0], 0, 0, 0, 0, 0, 0, -x[1]],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0, x[1]],
+         [-x[3]*x[4]/N[1], -x[3]*x[4]/N[1],   -x[3]*x[4]/N[1], 0, 0, 0, 0, 0, 0, 0],
+         [ x[3]*x[4]/N[1],  x[3]*x[4]/N[1],    x[3]*x[4]/N[1], 0, 0, 0, 0, 0, 0, -x[4]],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0, x[4]],
+         [-x[6]*x[7]/N[2], -x[6]*x[7]/N[2],   -x[6]*x[7]/N[2], 0, 0, 0, 0, 0, 0, 0],
+         [ x[6]*x[7]/N[2],  x[6]*x[7]/N[2],    x[6]*x[7]/N[2], 0, 0, 0, 0, 0, 0, -x[7]],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0, x[7]],
+        ])
+
+    # Return A if desired
+    if matrix:
+        return A
+
+    # Compute dxdt
+    dxdt = np.array(A) @ np.array(mp).T
+    
+    return dxdt
+
+
+
