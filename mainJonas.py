@@ -18,7 +18,11 @@ data, date_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_cou
 country = GetCountryCode('Denmark')
 dataDK = ExtractContries(data, country)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=False)
+=======
+SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=False)
+>>>>>>> Stashed changes
 =======
 SIRdata = SIRdataframe(dataDK, dark_number_scalar = 1, standardize=False)
 >>>>>>> Stashed changes
@@ -33,7 +37,11 @@ for i in range(1, 11):
         mp_used = np.array([i/10, j/10])
         SIR = SimulateModel(t, [5600000, 100000, 0], mp_used)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         mp = LeastSquareModel(t, SIR, normalize=True)
+=======
+        mp = LeastSquareModel(t, SIR)
+>>>>>>> Stashed changes
 =======
         mp = LeastSquareModel(t, SIR)
 >>>>>>> Stashed changes
@@ -51,8 +59,11 @@ ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, A)
 ax.set_title('Surface plot')
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 ax.set_xlabel('Beta')
 ax.set_ylabel('Gamma')
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 plt.show()
@@ -60,7 +71,11 @@ plt.show()
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 traindays = 21
+=======
+traindays = 7
+>>>>>>> Stashed changes
 =======
 traindays = 7
 >>>>>>> Stashed changes

@@ -41,7 +41,11 @@ def SimulateModel(t, x0, mp, model=SIR):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
+=======
+def LeastSquareModel(t, data, model=SIR, fix_params = None):
+>>>>>>> Stashed changes
 =======
 def LeastSquareModel(t, data, model=SIR, fix_params = None):
 >>>>>>> Stashed changes
@@ -84,6 +88,7 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
     A = np.zeros((m*n, k))
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if normalize:
         # Normalize equations
         std = np.std(gradient, axis=0)
@@ -98,6 +103,8 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
     # Create right hand side
     y = gradient.flatten()
 =======
+=======
+>>>>>>> Stashed changes
     y = gradient.flatten()
 
     for i, state in enumerate(data):
@@ -110,6 +117,9 @@ def LeastSquareModel(t, data, model=SIR, fix_params = None):
                     y -= fix_params[i] * A[:, i]
             
             A = np.delete(A, np.nonzero(fix_params), axis = 1)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     
     # Handle fixed parameters
