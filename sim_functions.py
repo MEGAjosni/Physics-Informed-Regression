@@ -56,6 +56,51 @@ def SimulateModel(t, x0, mp, model=SIR):
       
     return X
 
+def SimulateModel2(t, x0, mp, model=SIR,realtime = False):
+    '''
+    Description
+    -----------
+    Simulates the specified model using the solve_ivp method from scipy.integrate
+
+    Parameters
+    ----------
+    t : list
+        Sample points.
+    x0 : list
+        Initial value.
+    mp : list
+        Model parameters.
+    model : function, optional
+        The model to simulate. The default is SIR.
+
+    Returns
+    -------
+    np.array
+        Simulated state at each sample point.
+
+    '''
+    
+    # Solve ivp
+    import scipy
+    if realtime:
+        solver = scipy.integrate.ode(model)
+        solver.set_initial_value(x0,t[0]).set_f_params(mp[0])
+        
+        sol = np.zeros((len(t),len(x0)))
+        sol[0] = x0
+        k=1
+        while solver.successful() and solver.t < t[-1]:
+            solver.integrate(t[k])
+            sol[k] = solver.y.T
+            k+=1
+            if solver.t < t[-2]:
+                solver.set_f_params(mp[k])
+        return sol
+        
+    else:
+        sol = scipy.integrate.solve_ivp(fun=model, t_span=(t[0], t[-1]), y0=x0, t_eval=t, args=tuple([mp]))
+        return sol.y.T
+
 
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
 
