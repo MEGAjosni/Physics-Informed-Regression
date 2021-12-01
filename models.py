@@ -105,7 +105,7 @@ def S3I3R(t, x, mp, matrix=False):
 # %%
 '''
 #################################################
-###### >>>>> Scandinaivian SIR model <<<<< ######
+###### >>>>> Triple Region SIR model <<<<< ######
 #################################################
 '''
 def TripleRegionSIR(t, x, mp, matrix=False):

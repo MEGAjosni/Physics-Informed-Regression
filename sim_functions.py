@@ -103,7 +103,6 @@ def SimulateModel2(t, x0, mp, model=SIR,realtime = False):
 
 
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
-
     '''
     Description
     -----------

@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 ################################################
 '''
 # ----------------------------------------------------------------------------------------------------
-x0 = [5700000, 100000, 0]           # Initial state.
+x0 = [5000000, 600000, 0]           # Initial state.
 mp = [0.2, 1/9]                     # Model parameters.
 T_sim = 100                         # Number of time steps that should be simulated.
 T_train = 14                        # Model trained on the first T_train time steps.
@@ -99,8 +99,8 @@ plt.show()
 ################################################
 '''
 # ----------------------------------------------------------------------------------------------------
-x0 = [5000000, 100000, 200000, 300000, 0]                           # Initial state.
-mp = [[0]*50 + [0.6]*49, 0.2, 0.1, 0.15, 0.15, 0.15]                              # Model parameters.
+x0 = [5000000, 10000, 100000, 100000, 0]                           # Initial state.
+mp = [[0]*50+[0.3]*49, 0.1, 0.1, 1/9, 1/9, 1/9]                                 # Model parameters.
 T_sim = 100                                                         # Number of time steps that should be simulated.
 T_train = 14                                                        # Model trained on the first T_train time steps.
 # ----------------------------------------------------------------------------------------------------
