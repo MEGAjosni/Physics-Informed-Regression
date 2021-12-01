@@ -11,6 +11,7 @@ from __future__ import print_function
 import io
 import re
 
+from os import getcwd
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
@@ -135,6 +136,8 @@ data = dde.data.PDE(
 net = dde.maps.FNN([1] + [30] * 5 + [7], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
 model.compile("adam", lr=0.001)
+#save
+model.save(getcwd())
 
 # callbacks for storing results, and outputting the values of C1, C2 subject to parameter estimation (model calibration)
 fnamevar = "variables_expanded_test.dat"
@@ -144,7 +147,7 @@ variable = dde.callbacks.VariableValue(
     filename=fnamevar
 )
 
-losshistory, train_state = model.train(epochs=70000, callbacks=[variable])
+losshistory, train_state = model.train(epochs=2000, callbacks=[variable])
 
 
 ### Post training processing ###

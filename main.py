@@ -5,14 +5,13 @@ Created on Fri Oct  1 00:17:49 2021
 @author: Marcus
 """
 
-import basic_ivp_funcs as b_ivp
 import matplotlib.pyplot as plt
 import numpy as np
 from data_functions import *
 import get_synth_data as gsd
 import paramest_functions_OLS as pest_OLS
-import pandas as pd
-import datetime as dt
+from models import SIR, S3I3R, TripleRegionSIR
+from sim_functions import SimulateModel, LeastSquareModel, NoneNegativeLeastSquares
 
 #initialise duration of simulation
 simdays = 100
@@ -26,13 +25,13 @@ overshoot = 14 #the amount of previous days included for parameter estimations i
 
 
 #initialize IC and parameters for the syntetic data
-X_0 = [10000, 30, 0] #initial conditions
+X0 = [10000, 30, 0] #initial conditions
 beta= 0.23  #rate of transmission
 gamma = 0.08 #rate of recovery
 noise_var = 0 #variance of added noise
 stepsize = 0.1 #stepsize in Runge-Kutta iteration
 
-T = np.arange(simdays)
+t = np.arange(simdays)
 
 ############ Which parameters to find ####################################
 pass_beta = None #"None" if you need a beta estimation, otherwise put a "beta" value
@@ -45,17 +44,11 @@ include_params = True #include parameters in plot
 
 
 #Generate synthetic data or use real data
-mp = [beta, gamma]
+#mp = [beta, gamma]
+mp = [[0.05*np.sin(2*np.pi/simdays*i)+0.2,gamma] for i in range(simdays)]
 
-"""
-t_syn, X_syn = gsd.Create_synth_data(X_0 = X_0,
-                      mp = mp,
-                      model_type = 'basic',
-                      simdays = simdays+overshoot,
-                      stepsize =  stepsize,
-                      noise_var = noise_var,
-                      )
-"""
+X_syn = SimulateModel(t, X0, mp, model=SIR, realtime=over_time)
+
 
     #real time parameter estimation from data
 mp_est = pest_OLS.SIR_params_over_time_OLS(
@@ -68,33 +61,22 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
 
 
 #simulation using retrieved parameters
-t_sim, SIR_sim = b_ivp.simulateSIR(
-    X_0=X_0,
-    mp=mp_est,
-    simtime=simdays,
-    stepsize = stepsize,
-    method=b_ivp.RK4)
+X_est = SimulateModel(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, realtime=over_time)
 
 
 #plots
 n = 5
 fig, ax = plt.subplots()
 ax2 = ax.twinx()
-ax.scatter(t_syn[::n*10],X_syn[::n,0])
-#ax.scatter(T[::n],X_syn[::n,1])
-#ax.scatter(T[::n],X_syn[::n,2])
-ax.plot(t_sim,SIR_sim[:,0])
-#ax.plot(t_sim,SIR_sim[:,1])
-#ax.plot(t_sim,SIR_sim[:,2])
-#ax.legend(["S","I","R"],loc="upper left")
+ax.scatter(t[::n],X_syn[::n,1])
+ax.plot(t[overshoot:],X_est[:,1])
 ax.legend("S",loc="upper left")
 
 if include_params:
     ax2.plot(mp_est[:,0], c = "r")
     ax2.plot(mp_est[:,1], c = "tab:purple")
-    if syn:
-        ax2.plot(T,beta*np.ones(len(T)),"--",c = "r")
-        ax2.plot(T,gamma*np.ones(len(T)),"--",c = "tab:purple")
+    ax2.plot(t,beta*np.ones(len(t)),"--",c = "r")
+    ax2.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
     ax2.set_ylim(0,0.30)
     ax2.legend(["b est","g est","b true", "g true"],loc = "upper right")
 
