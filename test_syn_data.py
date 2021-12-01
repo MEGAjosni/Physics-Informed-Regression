@@ -4,7 +4,7 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-from models import SIR, S3I3R, TripleRegionSIR
+from models import SIR, S3I3R, TripleRegionSIR, MultivariantSIR
 from sim_functions import SimulateModel, LeastSquareModel, NoneNegativeLeastSquares
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +25,7 @@ T_train = 14                        # Model trained on the first T_train time st
 # Generate synthetic data
 t = np.arange(T_sim)
 X = SimulateModel(t, x0, mp, model=SIR)
+
 
 # Estimate parameters and project
 mp_est = LeastSquareModel(t[:T_train], X[0:T_train, :], model=SIR, normalize=True)
@@ -91,8 +92,29 @@ plt.plot(t[T_train:], X_est[:, 1::3], '--')
 plt.legend(['Simulated Infected DK', 'Simulated Infected SE', 'Simulated Infected NO', 'Predicted Infected DK', 'Predicted Infected SE', 'Predicted Infected NO'])
 plt.show()
 
+# %%
+'''
+################################################
+###### >>>>> Multivariant SIR model <<<<< ######
+################################################
+'''
+# ----------------------------------------------------------------------------------------------------
+x0 = [5000000, 100000, 200000, 300000, 0]                           # Initial state.
+mp = [[0]*50 + [0.6]*49, 0.2, 0.1, 0.15, 0.15, 0.15]                              # Model parameters.
+T_sim = 100                                                         # Number of time steps that should be simulated.
+T_train = 14                                                        # Model trained on the first T_train time steps.
+# ----------------------------------------------------------------------------------------------------
 
+# Generate synthetic data
+t = np.arange(T_sim)
+X = SimulateModel(t, x0, mp, model=MultivariantSIR)
 
+# Estimate parameters and project
+mp_est = LeastSquareModel(t[:T_train], X[:T_train, :], model=MultivariantSIR, normalize=True)
+X_est = SimulateModel(t[T_train:], X[T_train, :], mp_est, model=MultivariantSIR)
 
-
-
+# Plot results
+plt.plot(t, X[:, 1:4])
+plt.plot(t[T_train:], X_est[:, 1:4], '--')
+plt.legend(['Simulated variant 1', 'Simulated variant 2', 'Simulated variant 3', 'Predicted variant 1', 'Predicted variant 2', 'Predicted variant 3'])
+plt.show()

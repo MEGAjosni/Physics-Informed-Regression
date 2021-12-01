@@ -8,7 +8,7 @@ os.chdir(dname)
 from models import SIR
 
 
-def SimulateModel(t, x0, mp, model=SIR):
+def SimulateModel(t, x0, mp, model=SIR,realtime = False):
     '''
     Description
     -----------
@@ -32,29 +32,27 @@ def SimulateModel(t, x0, mp, model=SIR):
 
     '''
     
-    # Include support for variable parameters
-    MP = []
-    for idx, param in enumerate(mp):
-        # Check if parameter is already specified as a list and matches number of periods.
-        if type(param) == list:
-            if len(param) == len(t)-1:
-                MP.append(param)
-            else:
-                print('Error: Dimension of parameter at index', idx, 'does not match the dimension of t;', len(param), 'vs.', len(t)-1)
-        else:
-            # If parameter is specified as a single value, use that values at each timestep.
-            MP.append([param]*(len(t)-1))
-    MP = np.array(MP).T
-    
-    # Run simulation
-    from scipy.integrate import solve_ivp
-    
-    X = np.array([x0])
-    for idx, tk in enumerate(t[1:]):
-        sol = solve_ivp(fun=model, t_span=(t[idx], t[idx+1]), y0=X[idx, :], t_eval=[tk], args=tuple([MP[idx]])) 
-        X = np.concatenate((X, sol.y.T), axis=0)
-      
-    return X
+    # Solve ivp
+    import scipy
+    if realtime:
+        solver = scipy.integrate.ode(model)
+        solver.set_initial_value(x0,t[0]).set_f_params(mp[0])
+        
+        sol = np.zeros((len(t),len(x0)))
+        sol[0] = x0
+        k=1
+        while solver.successful() and solver.t < t[-1]:
+            solver.integrate(t[k])
+            sol[k] = solver.y.T
+            k+=1
+            if solver.t < t[-2]:
+                solver.set_f_params(mp[k])
+        return sol
+        
+    else:
+        sol = scipy.integrate.solve_ivp(fun=model, t_span=(t[0], t[-1]), y0=x0, t_eval=t, args=tuple([mp]))
+        return sol.y.T
+
 
 
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):

@@ -157,4 +157,55 @@ def TripleRegionSIR(t, x, mp, matrix=False):
     return dxdt
 
 
+# %%
+'''
+################################################
+###### >>>>> Multivariant SIR model <<<<< ######
+################################################
+'''
+def MultivariantSIR(t, x, mp, matrix=False):
+    '''
+    Parameters
+    ----------
+    t : list
+        Sample times - Only specified by ode solver.
+        Prototype: t = [t1, t2, ..., tn]
+    x : list
+        State of the model.
+        Prototype: x = [S, I1, I2, ..., In, R].
+    mp: list
+        Parameters of the model.
+        Prototype: mp = [beta1, beta2, ..., betan, gamma1, gamma2, ..., gamman].
+    matrix : Boolean, optional
+        If true, returns system matrix. The default is False.
 
+    Returns
+    -------
+    np.array
+        Default, dxdt.
+
+    '''
+    
+    # Compute the total population
+    N = sum(x) # S + I1 + I2 + ... + In + R
+    
+    # Construct system matrix from model
+    
+    n = len(x)
+    m = int(n-2)
+    
+    A = np.zeros((n, 2*m))
+    
+    for i in range(m):
+        A[0, i] = -x[0]*x[i+1]/N
+        A[n-1, m+i] = x[i+1]
+        A[i+1, i], A[i+1, i+2] = x[0]*x[i+1]/N, -x[i+1]
+    
+    # Return A if desired
+    if matrix:
+        return A
+
+    # Compute dxdt
+    dxdt = np.array(A) @ np.array(mp).T
+    
+    return dxdt

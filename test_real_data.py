@@ -44,7 +44,6 @@ X = np.concatenate([SIRdk.iloc[t], SIRse.iloc[t], SIRno.iloc[t]], axis=1)
 mp_est = LeastSquareModel(t[:T_train], X[:T_train, :], model=TripleRegionSIR, normalize=True)
 X_est = SimulateModel(t[T_train:], X[T_train, :], mp_est, model=TripleRegionSIR)
 
-
 # Plot results
 plt.plot(t, X[:, 1::3])
 plt.plot(t[T_train:], X_est[:, 1::3], '--')
