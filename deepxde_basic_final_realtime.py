@@ -17,12 +17,12 @@ import numpy as np
 import requests
 
 import deepxde as dde
-#from deepxde.backend import tf
+from deepxde.backend import tf
 
 import numpy as np
 from scipy.integrate import odeint
 from models import SIR, S3I3R, TripleRegionSIR
-from sim_functions import SimulateModel, LeastSquareModel, NoneNegativeLeastSquares
+from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
 # SIR model parameters
 simdays = 200   # compute ground truth
@@ -47,15 +47,15 @@ C2true = gamma
 
 # Generate true solution
 x0_train = [9.99999833e-01, 1.66666667e-07, 0.00000000e+00] # Initial condition
-x_true = SimulateModel(t_true, x0_train, mp, model=SIR, realtime=True)
+x_true = SimulateModel2(t_true, x0_train, mp, model=SIR, realtime=True)
 
 # Generate measurement data
 dt = 0.1
 t_test = np.arange(0, simdays,dt) # to be used for prediction
-x_true = SimulateModel(t_test, x0_train, mpfun(t_test,beta,gamma,simdays), model=SIR, realtime=True)
+x_true = SimulateModel2(t_test, x0_train, mpfun(t_test,beta,gamma,simdays), model=SIR, realtime=True)
 t_test = t_test.reshape(len(t_test),-1)
 t_train = np.arange(0, t0predict, dt)
-x_train = SimulateModel(t_train, x0_train, mpfun(t_train,beta,gamma,simdays), model=SIR, realtime=True)
+x_train = SimulateModel2(t_train, x0_train, mpfun(t_train,beta,gamma,simdays), model=SIR, realtime=True)
 t_train = t_train.reshape((len(t_train),1)) # reshape array to fit with DeepXDE
 
 def boundary(_, on_initial):
@@ -71,8 +71,8 @@ def SIR_system(t,z):
     dz2_t = dde.grad.jacobian(z, t, i=2)
     return [
       dz0_t - ( -tf.gather(C1,day)*z0*z1 )  ,
-      dz1_t - ( tf.gather(C1,day)*z0*z1 - tf.gather(C2,day)*z1 ),
-      dz2_t - ( tf.gather(C2,day)*z1 )
+      dz1_t - ( tf.gather(C1,day)*z0*z1 - C2*z1 ),
+      dz2_t - ( C2*z1 )
     ]   
 
 # define time domain
@@ -110,7 +110,7 @@ plt.show()
 # define FNN architecture and compile
 net = dde.maps.FNN([1] + [20] * 3 + [3], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
-model.compile("adam", lr=0.001)
+model.compile("adam", lr=0.001,run_eagerly = True)
 model.save(getcwd())
 
 
