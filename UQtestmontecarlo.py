@@ -26,16 +26,17 @@ SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=
 '''
 
 # ----------------------------------------------------------------------------------------------------
-t0 = '2020-12-12'           # Day the from which the projection is made.
-T_train = 14                # Number of days used to estimate beta.
+startday = '2020-12-12'     # Day the from which the projection is made.
+T_train = 7                # Number of days used to estimate beta.
 T_proj = 14                 # Number of days to project forward from t0.
 T_samp = 7                  # Number of proceeding timesteps of t0 for which beta should be sampled.
 gamma = 1/9                 # Gamma is assumed constant.
+n_mc = 1000                 # Number of random samples to make.
 # ----------------------------------------------------------------------------------------------------
 
 
 # Sample beta over the last T_samp timesteps to obtain its distribution.
-t0 = date_dict[t0]
+t0 = date_dict[startday]
 betas = np.array([])
 for i in range(T_samp):
     t = np.arange(t0-T_train-i, t0-i)
@@ -45,34 +46,35 @@ for i in range(T_samp):
 mu = np.mean(betas)
 sigma = np.std(betas)
 
+# Pick out n_mc random samples 
+mc_betas = np.random.normal(mu, sigma, n_mc)
 
-# Simulate different confidence intervals from the distribution of beta.
-ts = np.arange(t0, t0 + T_proj)
+# Simulate each sample
+ts = np.arange(t0, t0 + T_proj + 1)
+mc_sims = np.empty((T_proj + 1, n_mc))
 
-SIRupper = SimulateModel(ts, SIRdata.iloc[t0], [mu - 3*sigma, gamma])
-SIRlower = SimulateModel(ts, SIRdata.iloc[t0], [mu + 3*sigma, gamma])
+for idx, beta in enumerate(mc_betas):
+    mc_sims[:, idx] = SimulateModel(ts, SIRdata.iloc[t0], [beta, gamma])[:, 1]
 
-plt.plot(ts, SIRlower[:, 1], 'g--')
-plt.plot(ts, SIRupper[:, 1], 'g--', label='_nolegend_')
-plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='g')
+mu_sim = np.mean(mc_sims, axis=1)
+std_sim = np.std(mc_sims, axis=1)
 
-SIRupper = SimulateModel(ts, SIRdata.iloc[t0], [mu - 2*sigma, gamma])
-SIRlower = SimulateModel(ts, SIRdata.iloc[t0], [mu + 2*sigma, gamma])
+CI_colors = ['darkslateblue', 'slateblue', 'mediumslateblue']
+CI_style = '--'
 
-plt.plot(ts, SIRlower[:, 1], 'b--')
-plt.plot(ts, SIRupper[:, 1], 'b--', label='_nolegend_')
-plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='b', alpha=0.5)
+# >>>>> Plot Monte Carlo simulations <<<<<
+plt.plot(np.arange(t0 - T_train, t0 + T_proj), SIRdata.iloc[np.arange(t0 - T_train, t0 + T_proj)]['I'], color='orange', marker='x')
+plt.plot(ts, mc_sims, color='royalblue')
+plt.legend(['Observed Infected', 'Monte Carlo simulations'])
+plt.title('Plot of Monte Carlo simulations from {}'.format(startday))
+plt.show()
 
-SIRupper = SimulateModel(ts, SIRdata.iloc[t0], [mu - 1*sigma, gamma])
-SIRlower = SimulateModel(ts, SIRdata.iloc[t0], [mu + 1*sigma, gamma])
+# >>>>> Plot confidence intervals <<<<<
+for idx, color in reversed(list(enumerate(CI_colors, 1))):
+    plt.fill_between(ts, mu_sim - idx * std_sim, mu_sim + idx * std_sim, color=color, alpha=1)
 
-plt.plot(ts, SIRlower[:, 1], 'm--')
-plt.plot(ts, SIRupper[:, 1], 'm--', label='_nolegend_')
-plt.fill_between(ts, SIRlower[:, 1], SIRupper[:, 1], color='m', alpha=0.5)
-
-plt.plot(ts, SIRdata.iloc[ts]['I'], color='orange', marker='x')
-plt.legend(['99.7% Confidence Interval','95% Confidence Interval','68.2% Confidence Interval','Observed Infected'])
-plt.title('Projecting ' + str(T_proj) + ' days forward from ' + [key for key, value in date_dict.items() if value == t0][0])
-tikzplotlib.save("graphix/20200814.tex")
-
+# Plot observations
+plt.plot(np.arange(t0 - T_train, t0 + T_proj), SIRdata.iloc[np.arange(t0 - T_train, t0 + T_proj)]['I'], color='orange', marker='x')
+plt.legend(['Observed Infected', '99.7% Confidence Interval', '95% Confidence Interval', '68.2% Confidence Interval'])
+plt.title('Confidence Intervals of Monte Carlo simulation from {}'.format(startday))
 plt.show()
