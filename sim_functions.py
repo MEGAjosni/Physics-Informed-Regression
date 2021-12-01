@@ -58,7 +58,6 @@ def SimulateModel(t, x0, mp, model=SIR):
 
 
 def LeastSquareModel(t, data, model=SIR, fix_params=None, normalize=False):
-
     '''
     Description
     -----------

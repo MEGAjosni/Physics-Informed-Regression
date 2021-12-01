@@ -27,7 +27,7 @@ SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=
 
 # ----------------------------------------------------------------------------------------------------
 startday = '2020-12-12'     # Day the from which the projection is made.
-T_train = 7                # Number of days used to estimate beta.
+T_train = 7                 # Number of days used to estimate beta.
 T_proj = 14                 # Number of days to project forward from t0.
 T_samp = 7                  # Number of proceeding timesteps of t0 for which beta should be sampled.
 gamma = 1/9                 # Gamma is assumed constant.
