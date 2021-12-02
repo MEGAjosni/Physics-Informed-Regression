@@ -76,8 +76,8 @@ dt = 0.1
 days_for_est = 3
 for day in range(days_for_est,simdays): 
     print(day)
-    C1 = tf.Variable(1.0)
-    C2 = tf.Variable(1.0)
+    C1 = tf.Variable(0.5)
+    C2 = tf.Variable(0.5)
     # trains a model for each day, taking the previous {days_for_est} number of days as training data
     # after each day save gamma and beta 
 
@@ -132,7 +132,7 @@ for day in range(days_for_est,simdays):
         filename=fnamevar
     )
     
-    losshistory, train_state = model.train(epochs=30000, callbacks=[variable])
+    losshistory, train_state = model.train(epochs=40000, callbacks=[variable])
     
     # reopen saved data using callbacks in fnamevar 
     lines = open(fnamevar, "r").readlines()
