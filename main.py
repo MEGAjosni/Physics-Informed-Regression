@@ -12,6 +12,8 @@ import paramest_functions_OLS as pest_OLS
 from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
+
+
 #initialise duration of simulation
 simdays = 150
 t1 = 0
@@ -48,7 +50,7 @@ mp = np.array([[0.05*np.sin(2*np.pi/simdays*i)+beta,gamma] for i in range(simday
 X_syn = SimulateModel2(t, X0, mp, model=SIR, realtime=over_time)
 
 
-    #real time parameter estimation from data
+    #real time parameters using OLS
 mp_est = pest_OLS.SIR_params_over_time_OLS(
         t1 = t1,
         t2 = t2,
@@ -56,30 +58,42 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
         X = X_syn,
         beta = pass_beta,
         gamma = pass_gamma)
+#real time paramaters using PINNS
+mp_pinn = np.zeros((147,2))
 
+fname = "pinn_params_SIR"
+file = open(fname+".out",'r')
+k = 0
+for line in file.readlines():
+    mp_pinn[k] = line.split(",")
+    k+= 1
 
 #simulation using retrieved parameters
-X_est = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, realtime=over_time)
+X_ols = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, realtime=over_time)
+X_pinn = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_pinn, model=SIR, realtime=over_time)
+
 
 
 #plots
 n = 5
 fig, ax = plt.subplots()
 ax2 = ax.twinx()
-ax.scatter(t[::n],X_syn[::n,1])
-ax.plot(t[overshoot:],X_est[:,1])
-ax.legend("S",loc="upper left")
+ax.plot(t,X_syn[:,1])
+ax.scatter(t[overshoot::n],X_ols[::n,1])
+#ax.scatter(t[overshoot::n],X_pinn[::n,1])
+ax.legend(["I","I_OLS"],loc="upper left")
 
 if include_params:
-    ax2.plot(mp_est[:,0], c = "r")
-    ax2.plot(mp_est[:,1], c = "tab:purple")
+    ax2.scatter(t[::n],mp_est[::n,0], c = "r")
+    ax2.scatter(t[::n],mp_pinn[::n,0], c = "r")
+    ax2.scatter(t[::n],mp_est[::n,1], c = "tab:purple")
     if over_time:
-        ax2.plot(t,mp[:,0],"--",c = "r")
-        ax2.plot(t,mp[:,1],"--",c = "tab:purple")
+        ax2.plot(t,mp[:,0],c = "r")
+        ax2.plot(t,mp[:,1],c = "tab:purple")
     else:
        ax2.plot(t,beta*np.ones(len(t)),"--",c = "r")
        ax2.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
-    ax2.set_ylim(0,0.30)
-    ax2.legend(["b est","g est","b true", "g true"],loc = "upper right")
+    ax2.set_ylim(0.3,0.6)
+    ax2.legend(["b OLS","g OLS","b true", "g true"],loc = "upper right")
 
 
