@@ -65,7 +65,7 @@ def SIR_system(t,z):
 
 # generate mp (with high resolution of dt, over entire domain)
 t_mp= np.arange(0, simdays,dt)
-mp = mpfun(t_mp,beta,gamma,simdays)
+mp = mpfun(t_mp,beta,gamma,simdays/2)
 
 
 # Generate true solution
@@ -160,7 +160,7 @@ for day in range(1,simdays):
     #print(mp_day)
     
 # save estimated parameters    
-np.savetxt('pinn_params_SIR2.out',varying_params_est,delimiter = ',')
+np.savetxt('pinn_params_SIR3.out',varying_params_est,delimiter = ',')
 
 
 # plot against actual parameters 
