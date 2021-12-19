@@ -25,7 +25,6 @@ import sim_functions as sf
 
 ### Data ###
 
-
 # S3I3R model parameters
 tfinal = 7*6   # total days
 t0predict = 7*4 # timie limit for traininig data, extrapolate from this time
@@ -40,10 +39,10 @@ tau = 0.001
 mp = [beta, gamma1, gamma2, gamma3, phi1, phi2, theta, tau]
 
 # parameters to be estimated (only 4 of 8)
-beta_var = tf.Variable(0.5)
-phi1_var = tf.Variable(0.5)
-phi2_var = tf.Variable(0.5)
-theta_var = tf.Variable(0.5)
+beta_var = tf.Variable(1.0)
+phi1_var = tf.Variable(1.0)
+phi2_var = tf.Variable(1.0)
+theta_var = tf.Variable(1.0)
 
 # Generate true solution
 dt = .25 # time step
@@ -125,7 +124,7 @@ data = dde.data.PDE(
     geom,
     S3I3R_system,
     [ic1, ic2, ic3, ic4, ic5, ic6, ic7,observe_S, observe_I1, observe_I2, observe_I3, observe_R1, observe_R2, observe_R3],
-    num_domain=int(t0predict/dt), 
+    num_domain=800, 
     num_boundary=2,
     anchors=t_test
 )
@@ -136,8 +135,6 @@ data = dde.data.PDE(
 net = dde.maps.FNN([1] + [30] * 5 + [7], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
 model.compile("adam", lr=0.001)
-#save
-model.save(getcwd())
 
 # callbacks for storing results, and outputting the values of C1, C2 subject to parameter estimation (model calibration)
 fnamevar = "variables_expanded_test.dat"
@@ -147,7 +144,7 @@ variable = dde.callbacks.VariableValue(
     filename=fnamevar
 )
 
-losshistory, train_state = model.train(epochs=50000, callbacks=[variable])
+losshistory, train_state = model.train(epochs=70000, callbacks=[variable])
 
 
 ### Post training processing ###
