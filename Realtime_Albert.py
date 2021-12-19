@@ -178,13 +178,12 @@ plt.scatter(t_params,gamma_est)
 plt.legend(['beta','gamma','beta est', 'gamma est'],loc='upper right')
 plt.title('estimating varying parameters, 4 day training per day')
 plt.xlabel('day')
-plt.ylim((0,1))
+plt.ylim((0.2,0.6))
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
 x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = SIR, realtime=(True))
-plt.scatter(t_params,x_pred[:,0])
+
 plt.scatter(t_params,x_pred[:,1])
-plt.scatter(t_params,x_pred[:,2])
-plt.plot(t_true,x_true)
+plt.plot(t_true,x_true[:,1])
 
