@@ -28,7 +28,7 @@ from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
 # SIR model parameters
-simdays = 10  # compute ground truth
+simdays = 21  # compute ground truth
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20
@@ -93,26 +93,25 @@ mp = mpfun(t_mp,beta,gamma1,gamma2,gamma3,phi1,phi2,theta,tau,simdays)
 
 
 # Generate true solution
-x0_train = [0.99999, 0.00001, 0,0,0,0,0] # Initial condition
+x0_train = [0.99, 0.01, 0,0,0,0,0] # Initial condition
 x_true = SimulateModel2(t_true, x0_train, mp, model=S3I3R, realtime=True)
 
 # Generate measurement data
 
 # plot prediction vs true data (true being data created with target parameters)
 t_params = np.arange(1,simdays)
-x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = SIR, realtime=(True))
-plt.scatter(t_params,x_pred[:,0])
-plt.scatter(t_params,x_pred[:,1])
-plt.scatter(t_params,x_pred[:,2])
-plt.scatter(t_params,x_pred[:,3])
-plt.scatter(t_params,x_pred[:,4])
-plt.scatter(t_params,x_pred[:,5])
-plt.scatter(t_params,x_pred[:,6])
+plt.scatter(t_true,x_true [:,0])
+plt.scatter(t_true,x_true [:,1])
+plt.scatter(t_true,x_true [:,2])
+plt.scatter(t_true,x_true [:,3])
+plt.scatter(t_true,x_true [:,4])
+plt.scatter(t_true,x_true [:,5])
+plt.scatter(t_true,x_true [:,6])
 plt.plot(t_true,x_true)
 
 for day in range(1,simdays): 
     
-    days_for_est = 5
+    days_for_est = 7
     if days_for_est > day:
         days_for_est = day
         
@@ -210,7 +209,7 @@ for day in range(1,simdays):
     print(mp_day)
     
 # save estimated parameters    
-np.savetxt('varying_parameters_S3I3R_v1.out',varying_params_est,delimiter = ',')
+np.savetxt('varying_parameters_S3I3R_v2.out',varying_params_est,delimiter = ',')
 
 
 # plot against actual parameters 
@@ -226,16 +225,19 @@ for i in range(len(varying_params_est)):
     theta_est[i] = (varying_params_est[i])[3]
 
 
-plt.plot(t_mp,mp)
+plt.plot(t_mp,mp[:,0])
+plt.plot(t_mp,mp[:,4])
+plt.plot(t_mp,mp[:,5])
+plt.plot(t_mp,mp[:,6])
 plt.scatter(t_params,beta_est)
 plt.scatter(t_params,phi1_est)
 plt.scatter(t_params,phi2_est)
 plt.scatter(t_params,theta_est)
-plt.legend(['beta','gamma','beta est', 'gamma est'],loc='upper right')
+plt.legend(['beta','phi1','phi2', 'theta','beta est','phi1 est','phi2 est', 'theta est'],loc='upper right')
 plt.title(f'estimating varying parameters, {days_for_est} day training per day')
 plt.xlabel('day')
-plt.ylim((-0.5,1))
-tikzplotlib.save("S3I3R_v1_5_days_4_est.tex")
+plt.ylim((-0.2,0.7))
+tikzplotlib.save("S3I3R_v2_7_days_4_est.tex")
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)

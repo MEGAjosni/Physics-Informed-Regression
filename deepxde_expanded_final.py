@@ -25,9 +25,11 @@ import sim_functions as sf
 
 ### Data ###
 
+file_string = "S3I3R_"
+
 # S3I3R model parameters
-tfinal = 7*6   # total days
-t0predict = 7*4 # timie limit for traininig data, extrapolate from this time
+tfinal = 7*4   # total days
+t0predict = 7*2 # timie limit for traininig data, extrapolate from this time
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20
@@ -35,7 +37,7 @@ gamma3 = 1/20
 phi1 = 1/20
 phi2 = 1/20
 theta = 1/10
-tau = 0.001
+tau = 0
 mp = [beta, gamma1, gamma2, gamma3, phi1, phi2, theta, tau]
 
 # parameters to be estimated (only 4 of 8)
@@ -47,7 +49,7 @@ theta_var = tf.Variable(1.0)
 # Generate true solution
 dt = .25 # time step
 t_true = np.arange(0, tfinal, dt)
-x0_train = [0.99999,0.00001,0.0,0.0,0.0,0.0,0.0] # Initial condition
+x0_train = [0.99,0.01,0.0,0.0,0.0,0.0,0.0] # Initial condition
 x_true = sf.SimulateModel(t_true, x0_train, mp,model=models.S3I3R) # why compute here, when overriding below?
 
 # Generate data 
@@ -124,7 +126,7 @@ data = dde.data.PDE(
     geom,
     S3I3R_system,
     [ic1, ic2, ic3, ic4, ic5, ic6, ic7,observe_S, observe_I1, observe_I2, observe_I3, observe_R1, observe_R2, observe_R3],
-    num_domain=800, 
+    num_domain=int(t0predict/dt), 
     num_boundary=2,
     anchors=t_test
 )
@@ -132,7 +134,7 @@ data = dde.data.PDE(
 
 
 # define FNN architecture and compile
-net = dde.maps.FNN([1] + [30] * 5 + [7], "tanh", "Glorot uniform")
+net = dde.maps.FNN([1] + [40] * 8 + [7], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
 model.compile("adam", lr=0.001)
 
