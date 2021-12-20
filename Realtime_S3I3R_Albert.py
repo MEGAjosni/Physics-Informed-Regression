@@ -26,7 +26,7 @@ from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
 # SIR model parameters
-simdays = 70  # compute ground truth
+simdays = 10  # compute ground truth
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20
@@ -91,14 +91,26 @@ mp = mpfun(t_mp,beta,gamma1,gamma2,gamma3,phi1,phi2,theta,tau,simdays)
 
 
 # Generate true solution
-x0_train = [1-0.005, 0.005, 0.00000000e+00] # Initial condition
-x_true = SimulateModel2(t_true, x0_train, mp, model=SIR, realtime=True)
+x0_train = [0.99999, 0.00001, 0,0,0,0,0] # Initial condition
+x_true = SimulateModel2(t_true, x0_train, mp, model=S3I3R, realtime=True)
 
 # Generate measurement data
 
+# plot prediction vs true data (true being data created with target parameters)
+t_params = np.arange(1,simdays)
+x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = SIR, realtime=(True))
+plt.scatter(t_params,x_pred[:,0])
+plt.scatter(t_params,x_pred[:,1])
+plt.scatter(t_params,x_pred[:,2])
+plt.scatter(t_params,x_pred[:,3])
+plt.scatter(t_params,x_pred[:,4])
+plt.scatter(t_params,x_pred[:,5])
+plt.scatter(t_params,x_pred[:,6])
+plt.plot(t_true,x_true)
+
 for day in range(1,simdays): 
     
-    days_for_est = 4
+    days_for_est = 5
     if days_for_est > day:
         days_for_est = day
         
@@ -121,7 +133,7 @@ for day in range(1,simdays):
     # take slice of mp matrix as current mp values 
     mp_day = mp[int(t_0/dt):int(day/dt)]
     
-    x_train = SimulateModel2(t_train, x_true[t_0,:], mp_day, model=SIR, realtime=True)
+    x_train = SimulateModel2(t_train, x_true[t_0,:], mp_day, model=S3I3R, realtime=True)
     t_train = t_train.reshape((len(t_train),1)) # reshape array to fit with DeepXDE
     
     # define time domain
@@ -160,7 +172,7 @@ for day in range(1,simdays):
     
     
     # define FNN architecture and compile
-    net = dde.maps.FNN([1] + [20] * 3 + [3], "tanh", "Glorot uniform")
+    net = dde.maps.FNN([1] + [40] * 8 + [7], "tanh", "Glorot uniform")
     model = dde.Model(data, net)
     model.compile("adam", lr=0.001)
     #model.save(getcwd())
@@ -174,7 +186,7 @@ for day in range(1,simdays):
     )
     
     # train model
-    losshistory, train_state = model.train(epochs=50000, callbacks=[variable])
+    losshistory, train_state = model.train(epochs=60000, callbacks=[variable])
     
     # reopen saved data using callbacks in fnamevar 
     lines = open(fnamevar, "r").readlines()
@@ -185,12 +197,15 @@ for day in range(1,simdays):
     # log parameters from best epoch, and output during training
     varying_params_est.append(Chat[train_state.best_step])
     avg_beta = sum(mp_day[:,0])/(len(mp_day[:,0]))
-    avg_gamma = sum(mp_day[:,1])/len(mp_day[:,1])
-    avg__true_params.append([avg_beta,avg_gamma])
+    avg_phi1 = sum(mp_day[:,4])/len(mp_day[:,4])
+    avg_phi2 = sum(mp_day[:,5])/len(mp_day[:,5])
+    avg_theta = sum(mp_day[:,6])/len(mp_day[:,6])
     print("----   Estimated -- Actual avg")
-    print("beta  ",Chat[train_state.best_step][0],"     ",avg_beta)
-    print("gamma ",Chat[train_state.best_step][1],"     ",avg_gamma)
-    #print(mp_day)
+    print("Beta ",Chat[train_state.best_step][0],"     ",avg_beta)
+    print("Phi1 ",Chat[train_state.best_step][1],"     ",avg_phi1)
+    print("Phi2 ",Chat[train_state.best_step][2],"     ",avg_phi2)
+    print("theta",Chat[train_state.best_step][3],"     ",avg_theta)
+    print(mp_day)
     
 # save estimated parameters    
 np.savetxt('varying_parameters_S3I3R_v1.out',varying_params_est,delimiter = ',')
@@ -198,20 +213,26 @@ np.savetxt('varying_parameters_S3I3R_v1.out',varying_params_est,delimiter = ',')
 
 # plot against actual parameters 
 beta_est = [0]*len(varying_params_est)
-gamma_est = [0]*len(varying_params_est)
+phi1_est = [0]*len(varying_params_est)
+phi2_est = [0]*len(varying_params_est)
+theta_est = [0]*len(varying_params_est)
 
 for i in range(len(varying_params_est)):
     beta_est[i] = (varying_params_est[i])[0]
-    gamma_est[i] = (varying_params_est[i])[1]
+    phi1_est[i] = (varying_params_est[i])[1]
+    phi2_est[i] = (varying_params_est[i])[2]
+    theta_est[i] = (varying_params_est[i])[3]
 
-t_params = np.arange(1,simdays)
+
 plt.plot(t_mp,mp)
 plt.scatter(t_params,beta_est)
-plt.scatter(t_params,gamma_est)
+plt.scatter(t_params,phi1_est)
+plt.scatter(t_params,phi2_est)
+plt.scatter(t_params,theta_est)
 plt.legend(['beta','gamma','beta est', 'gamma est'],loc='upper right')
-plt.title('estimating varying parameters, 4 day training per day')
+plt.title(f'estimating varying parameters, {days_for_est} day training per day')
 plt.xlabel('day')
-plt.ylim((0,1))
+plt.ylim((-0.5,1))
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
