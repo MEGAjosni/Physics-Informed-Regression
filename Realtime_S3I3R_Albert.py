@@ -20,6 +20,8 @@ from tempfile import TemporaryFile
 import deepxde as dde
 from deepxde.backend import tf
 
+import tikzplotlib
+
 import numpy as np
 from scipy.integrate import odeint
 from models import SIR, S3I3R, TripleRegionSIR
@@ -233,6 +235,7 @@ plt.legend(['beta','gamma','beta est', 'gamma est'],loc='upper right')
 plt.title(f'estimating varying parameters, {days_for_est} day training per day')
 plt.xlabel('day')
 plt.ylim((-0.5,1))
+tikzplotlib.save("S3I3R_v1_5_days_4_est.tex")
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
