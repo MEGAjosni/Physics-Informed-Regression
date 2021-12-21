@@ -28,8 +28,8 @@ import sim_functions as sf
 file_string = "S3I3R_"
 
 # S3I3R model parameters
-tfinal = 7*4   # total days
-t0predict = 7*2 # timie limit for traininig data, extrapolate from this time
+tfinal =  7*6  # total days
+t0predict = 7*4# timie limit for traininig data, extrapolate from this time
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20

@@ -218,6 +218,8 @@ for i in range(len(varying_params_est)):
     theta_est[i] = (varying_params_est[i])[3]
 
 
+fig = plt.figure()
+ax = plt.subplot(111)
 plt.plot(t_mp,mp[:,0])
 plt.plot(t_mp,mp[:,4])
 plt.plot(t_mp,mp[:,5])
@@ -226,15 +228,14 @@ plt.scatter(t_params,beta_est)
 plt.scatter(t_params,phi1_est)
 plt.scatter(t_params,phi2_est)
 plt.scatter(t_params,theta_est)
-plt.legend(['beta','phi1','phi2', 'theta','beta est','phi1 est','phi2 est', 'theta est'],loc='upper right')
-plt.title(f'estimating varying parameters, {days_for_est} day training per day')
+plt.legend(['beta','phi1','phi2', 'theta','beta est','phi1 est','phi2 est', 'theta est'],loc='upper left',bbox_to_anchor=(0.5,1.05),ncol=2)
 plt.xlabel('day')
-plt.ylim((-0.2,0.7))
-tikzplotlib.save("S3I3R_v5_5_days_4_est.tex")
+plt.ylim((-0.2,1))
+tikzplotlib.save("S3I3R_v5_5_days_4_est_larger.tex",)
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
-x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = S3I3R, realtime=(True))
+#x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = S3I3R, realtime=(True))
 plt.scatter(t_true,x_true [:,0])
 plt.scatter(t_true,x_true [:,1])
 plt.scatter(t_true,x_true [:,2])
