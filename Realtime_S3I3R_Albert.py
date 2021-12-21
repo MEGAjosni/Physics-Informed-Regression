@@ -28,7 +28,7 @@ from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
 # SIR model parameters
-simdays = 21  # compute ground truth
+simdays = 28*2  # compute ground truth
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20
@@ -93,21 +93,14 @@ mp = mpfun(t_mp,beta,gamma1,gamma2,gamma3,phi1,phi2,theta,tau,simdays)
 
 
 # Generate true solution
-x0_train = [0.99, 0.01, 0,0,0,0,0] # Initial condition
+x0_train = [0.99, 0.001, 0,0,0,0,0] # Initial condition
 x_true = SimulateModel2(t_true, x0_train, mp, model=S3I3R, realtime=True)
 
 # Generate measurement data
 
 # plot prediction vs true data (true being data created with target parameters)
 t_params = np.arange(1,simdays)
-plt.scatter(t_true,x_true [:,0])
-plt.scatter(t_true,x_true [:,1])
-plt.scatter(t_true,x_true [:,2])
-plt.scatter(t_true,x_true [:,3])
-plt.scatter(t_true,x_true [:,4])
-plt.scatter(t_true,x_true [:,5])
-plt.scatter(t_true,x_true [:,6])
-plt.plot(t_true,x_true)
+
 
 for day in range(1,simdays): 
     
@@ -209,7 +202,7 @@ for day in range(1,simdays):
     print(mp_day)
     
 # save estimated parameters    
-np.savetxt('varying_parameters_S3I3R_v2.out',varying_params_est,delimiter = ',')
+np.savetxt('varying_parameters_S3I3R_v5.out',varying_params_est,delimiter = ',')
 
 
 # plot against actual parameters 
@@ -237,13 +230,16 @@ plt.legend(['beta','phi1','phi2', 'theta','beta est','phi1 est','phi2 est', 'the
 plt.title(f'estimating varying parameters, {days_for_est} day training per day')
 plt.xlabel('day')
 plt.ylim((-0.2,0.7))
-tikzplotlib.save("S3I3R_v2_7_days_4_est.tex")
+tikzplotlib.save("S3I3R_v5_5_days_4_est.tex")
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
-x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = SIR, realtime=(True))
-plt.scatter(t_params,x_pred[:,0])
-plt.scatter(t_params,x_pred[:,1])
-plt.scatter(t_params,x_pred[:,2])
+x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = S3I3R, realtime=(True))
+plt.scatter(t_true,x_true [:,0])
+plt.scatter(t_true,x_true [:,1])
+plt.scatter(t_true,x_true [:,2])
+plt.scatter(t_true,x_true [:,3])
+plt.scatter(t_true,x_true [:,4])
+plt.scatter(t_true,x_true [:,5])
+plt.scatter(t_true,x_true [:,6])
 plt.plot(t_true,x_true)
-
