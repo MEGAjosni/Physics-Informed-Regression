@@ -10,7 +10,7 @@ from __future__ import print_function
 
 import io
 import re
-
+import tikzplotlib
 from os import getcwd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -49,7 +49,7 @@ theta_var = tf.Variable(1.0)
 # Generate true solution
 dt = .25 # time step
 t_true = np.arange(0, tfinal, dt)
-x0_train = [0.99,0.01,0.0,0.0,0.0,0.0,0.0] # Initial condition
+x0_train = [0.999,0.001,0.0,0.0,0.0,0.0,0.0] # Initial condition
 x_true = sf.SimulateModel(t_true, x0_train, mp,model=models.S3I3R) # why compute here, when overriding below?
 
 # Generate data 
@@ -171,15 +171,21 @@ plt.plot(range(l),np.ones(Chat[:,2].shape)*phi2,'g--')
 plt.plot(range(l),np.ones(Chat[:,3].shape)*theta,'y--')
 plt.legend(['beta est','phi1 est','phi2 est', 'theta est','beta','phi1','phi2','theta'])
 plt.xlabel('Epoch')
+tikzplotlib.save("S3I3R_const_v1_params.tex")
 plt.show()
 
 
 
 # test parameters with prediction
 yhat = model.predict(t_test)
-plt.plot(t_test,x_true,'k',observe_t, observe_X,'-',t_test, yhat,'--')
-plt.ylabel('Persons/Population')
-plt.xlabel('Time [days]')
+plt.plot(t_test,x_true[:,1],'k',observe_t, observe_X[:,1],'-',t_test, yhat[:,1],'--')
+plt.plot(t_test,x_true[:,2],'k',observe_t, observe_X[:,2],'-',t_test, yhat[:,2],'--')
+plt.plot(t_test,x_true[:,3],'k',observe_t, observe_X[:,3],'-',t_test, yhat[:,3],'--')
+plt.legend(['I1 train','I1 true','I1 pred','I2 train','I2 true','I2 pred','I3 train','I3 true','I3 pred'])
+plt.ylabel('Population fraction')
+plt.xlabel('Days')
 plt.title('Training data vs. PINN solution')
-plt.xlim(90,200)
+plt.xlim(0,tfinal)
+tikzplotlib.save("S3I3R_const_v1_I123.tex")
 plt.show()
+
