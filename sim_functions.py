@@ -7,6 +7,30 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 from models import SIR
 
+def AddNoise(X, mu=0, sigma=1):
+    '''
+
+    Parameters
+    ----------
+    X : TYPE
+        DESCRIPTION.
+    mu : TYPE
+        DESCRIPTION.
+    sigma : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
+
+    from numpy.random import normal
+
+    noise = normal(mu, sigma, X.shape)
+    
+    return X + noise
+    
 
 def SimulateModel(t, x0, mp, model=SIR):
     '''

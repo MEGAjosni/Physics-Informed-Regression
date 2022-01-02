@@ -4,7 +4,7 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-from models import SIR, S3I3R, TripleRegionSIR, MultivariantSIR
+from models import SIR, DarkNumberSIR, S3I3R, TripleRegionSIR, MultivariantSIR
 from sim_functions import SimulateModel, LeastSquareModel, NoneNegativeLeastSquares
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 ################################################
 '''
 # ----------------------------------------------------------------------------------------------------
-x0 = [5000000, 600000, 0]           # Initial state.
+x0 = [5000000, 10000, 0]           # Initial state.
 mp = [0.2, 1/9]                     # Model parameters.
 T_sim = 100                         # Number of time steps that should be simulated.
 T_train = 14                        # Model trained on the first T_train time steps.
@@ -35,6 +35,33 @@ X_est = SimulateModel(t[T_train:], X[T_train, :], mp_est, model=SIR)
 plt.plot(t, X[:, 1], 'm.')
 plt.plot(t[T_train:], X_est[:, 1], 'c-')
 plt.legend(['Simulated Infected', 'Predicted Infected'])
+plt.show()
+
+# %%
+'''
+###############################################
+###### >>>>> Dark number SIR model <<<<< ######
+###############################################
+'''
+# ----------------------------------------------------------------------------------------------------
+x0 = [5000000, 10000, 90000, 0]           # Initial state.
+mp = [0.2, 1/9]                     # Model parameters.
+T_sim = 100                         # Number of time steps that should be simulated.
+T_train = 14                        # Model trained on the first T_train time steps.
+# ----------------------------------------------------------------------------------------------------
+
+# Generate synthetic data
+t = np.arange(T_sim)
+X = SimulateModel(t, x0, mp, model=DarkNumberSIR)
+
+
+# Estimate parameters and project
+mp_est = LeastSquareModel(t[:T_train], X[0:T_train, :], model=DarkNumberSIR, normalize=True)
+X_est = SimulateModel(t[T_train:], X[T_train, :], mp_est, model=DarkNumberSIR)
+
+# Plot results
+plt.plot(t, X[:, 1:3])
+plt.legend(['Observed Infected', 'Dark number'])
 plt.show()
 
 # %%
@@ -100,7 +127,7 @@ plt.show()
 '''
 # ----------------------------------------------------------------------------------------------------
 x0 = [5000000, 10000, 100000, 100000, 0]                           # Initial state.
-mp = [[0]*50+[0.3]*49, 0.1, 0.1, 1/9, 1/9, 1/9]                                 # Model parameters.
+mp = [[0.15]*20+[0.5]*79, 0.12, 0.14, 1/9, 1/9, 1/9]                                 # Model parameters.
 T_sim = 100                                                         # Number of time steps that should be simulated.
 T_train = 14                                                        # Model trained on the first T_train time steps.
 # ----------------------------------------------------------------------------------------------------
@@ -115,6 +142,6 @@ X_est = SimulateModel(t[T_train:], X[T_train, :], mp_est, model=MultivariantSIR)
 
 # Plot results
 plt.plot(t, X[:, 1:4])
-plt.plot(t[T_train:], X_est[:, 1:4], '--')
+# plt.plot(t[T_train:], X_est[:, 1:4], '--')
 plt.legend(['Simulated variant 1', 'Simulated variant 2', 'Simulated variant 3', 'Predicted variant 1', 'Predicted variant 2', 'Predicted variant 3'])
 plt.show()
