@@ -106,3 +106,75 @@ def SIR_params_over_time_OLS(
         betas = beta*np.ones((len(mps),1))
         return np.hstack((betas,mps))
     return mps
+
+
+def estimate_params_expanded_LA(
+        t1: int,  # Start
+        t2: int,  # Stop
+        X: np.array,
+        mp: np.array,  # Known model parameters [gamma1, gamma2, gamma3]
+):
+    X_0 = X[t1,:]
+    N = sum(X_0)
+    simdays = t2 - t1
+
+    dX = np.gradient(X,axis=0)
+    dX_norms = np.linalg.norm(dX, axis=0)
+
+    for k in range(t1,t2):
+        dxt = dX[k,:]
+        xt = X[k,:]
+        # xt = [S I1 I2 I3 R1 R2 R3]
+
+        A = np.array(
+            [
+                [-xt[1]*xt[0]/N,    0,      0,      0],
+                [xt[0]*xt[1]/N,     -xt[1], 0,      0],
+                [0,                 xt[1],  -xt[2], 0],
+                [0,                 0,      xt[2],  -xt[3]],
+                [0,                 0,      0,      xt[3]]
+            ]
+        )
+
+        b = np.array(
+            [
+                dxt[0] + dxt[5]*xt[0]/(xt[0]+xt[1]+xt[4]),
+                dxt[1] + xt[1]*mp[0] + xt[1]*dxt[5]/(xt[0]+xt[1]+xt[4]),
+                dxt[2] + mp[1]*xt[2],
+                dxt[3] + mp[2]*xt[3],
+                dxt[6]
+            ]
+        )
+
+        if k == t1:
+            As = A
+            bs = b
+        else:
+            As = np.concatenate([As,A],axis = 0)
+            bs = np.concatenate([bs,b])
+
+    beta,phi1,phi2,theta = np.linalg.lstsq(As, bs, rcond=None)[0]
+    mp2 = [beta, phi1, phi2, theta]
+    return np.array(mp2)
+
+def params_over_time_expanded_LA(
+        t1: int,
+        t2: int,
+        overshoot: int,
+        X: np.array,
+        mp: np.array
+):
+
+    simdays = (t2 - t1) + 1
+    params = np.zeros((4, simdays))
+
+    for k in range(simdays):
+        params[:, k] = estimate_params_expanded_LA(
+            t1=t1 + k - overshoot,
+            t2=t1 + k,
+            X=X,
+            mp=mp,
+        )
+        # print(params[:, 0:k+1])
+
+    return params

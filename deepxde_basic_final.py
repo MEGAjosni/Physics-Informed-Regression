@@ -24,8 +24,8 @@ import numpy as np
 from scipy.integrate import odeint
 
 # SIR model parameters
-tfinal = 200   # compute ground truth
-t0predict = 120 # timie limit for traininig data, extrapolate from this time
+tfinal = 80   # compute ground truth
+t0predict = 50 # timie limit for traininig data, extrapolate from this time
 b=0.5 
 k=1/3
 
@@ -47,7 +47,7 @@ def SIR(z, t):
 # Generate true solution
 dt = .25 # time step
 t_true = np.arange(0, tfinal, dt)
-x0_train = [9.99999833e-01, 1.66666667e-07, 0.00000000e+00] # Initial condition
+x0_train = [1-0.0001, 0.0001, 0.00000000e+00] # Initial condition
 
 # Generate measurement data
 dt = .1 # time step
@@ -120,7 +120,7 @@ variable = dde.callbacks.VariableValue(
     filename=fnamevar
 )
 
-losshistory, train_state = model.train(epochs=1000, callbacks=[variable])
+losshistory, train_state = model.train(epochs=20000, callbacks=[variable])
 
 # reopen saved data using callbacks in fnamevar 
 lines = open(fnamevar, "r").readlines()

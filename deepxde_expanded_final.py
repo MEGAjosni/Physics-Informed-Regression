@@ -10,7 +10,7 @@ from __future__ import print_function
 
 import io
 import re
-
+import tikzplotlib
 from os import getcwd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,10 +25,11 @@ import sim_functions as sf
 
 ### Data ###
 
+file_string = "S3I3R_"
 
 # S3I3R model parameters
-tfinal = 200   # total days
-t0predict = 125 # timie limit for traininig data, extrapolate from this time
+tfinal =  7*6  # total days
+t0predict = 7*4# timie limit for traininig data, extrapolate from this time
 beta = 0.5
 gamma1 = 1/3 
 gamma2 = 1/20
@@ -36,7 +37,7 @@ gamma3 = 1/20
 phi1 = 1/20
 phi2 = 1/20
 theta = 1/10
-tau = 0.001
+tau = 0
 mp = [beta, gamma1, gamma2, gamma3, phi1, phi2, theta, tau]
 
 # parameters to be estimated (only 4 of 8)
@@ -48,7 +49,7 @@ theta_var = tf.Variable(1.0)
 # Generate true solution
 dt = .25 # time step
 t_true = np.arange(0, tfinal, dt)
-x0_train = [0.99999,0.00001,0.0,0.0,0.0,0.0,0.0] # Initial condition
+x0_train = [0.9999,0.0001,0.0,0.0,0.0,0.0,0.0] # Initial condition
 x_true = sf.SimulateModel(t_true, x0_train, mp,model=models.S3I3R) # why compute here, when overriding below?
 
 # Generate data 
@@ -125,7 +126,7 @@ data = dde.data.PDE(
     geom,
     S3I3R_system,
     [ic1, ic2, ic3, ic4, ic5, ic6, ic7,observe_S, observe_I1, observe_I2, observe_I3, observe_R1, observe_R2, observe_R3],
-    num_domain=800, 
+    num_domain=int(t0predict/dt), 
     num_boundary=2,
     anchors=t_test
 )
@@ -133,11 +134,9 @@ data = dde.data.PDE(
 
 
 # define FNN architecture and compile
-net = dde.maps.FNN([1] + [30] * 5 + [7], "tanh", "Glorot uniform")
+net = dde.maps.FNN([1] + [40] * 8 + [7], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
 model.compile("adam", lr=0.001)
-#save
-model.save(getcwd())
 
 # callbacks for storing results, and outputting the values of C1, C2 subject to parameter estimation (model calibration)
 fnamevar = "variables_expanded_test.dat"
@@ -147,7 +146,7 @@ variable = dde.callbacks.VariableValue(
     filename=fnamevar
 )
 
-losshistory, train_state = model.train(epochs=2000, callbacks=[variable])
+losshistory, train_state = model.train(epochs=70000, callbacks=[variable])
 
 
 ### Post training processing ###
@@ -161,26 +160,38 @@ Chat = np.array([np.fromstring(min(re.findall(re.escape('[')+"(.*?)"+re.escape('
 l,c = Chat.shape
 
 
+Chat_scale = np.array([Chat[0]])
+for ind,val in enumerate(Chat):
+    if ind%100==0 and ind!=0:
+        print(val)
+        Chat_scale = np.append(Chat_scale,np.array([val]),axis=0)
+
 # plot parameter convergance by epoch
-plt.plot(range(l),Chat[:,0],'r-')
-plt.plot(range(l),Chat[:,1],'k-')
-plt.plot(range(l),Chat[:,2],'b-')
-plt.plot(range(l),Chat[:,3],'y-')
-plt.plot(range(l),np.ones(Chat[:,0].shape)*beta,'r--')
-plt.plot(range(l),np.ones(Chat[:,1].shape)*phi1,'k--')
-plt.plot(range(l),np.ones(Chat[:,2].shape)*phi2,'g--')
-plt.plot(range(l),np.ones(Chat[:,3].shape)*theta,'y--')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,0],'r-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,1],'k-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,2],'b-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,3],'y-')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,0].shape)*beta,'r--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,1].shape)*phi1,'k--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,2].shape)*phi2,'g--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,3].shape)*theta,'y--')
 plt.legend(['beta est','phi1 est','phi2 est', 'theta est','beta','phi1','phi2','theta'])
 plt.xlabel('Epoch')
+tikzplotlib.save("S3I3R_const_v3_params.tex")
 plt.show()
 
 
 
 # test parameters with prediction
 yhat = model.predict(t_test)
-plt.plot(t_test,x_true,'k',observe_t, observe_X,'-',t_test, yhat,'--')
-plt.ylabel('Persons/Population')
-plt.xlabel('Time [days]')
+plt.plot(t_test,x_true[:,1],'k',observe_t, observe_X[:,1],'-',t_test, yhat[:,1],'--')
+plt.plot(t_test,x_true[:,2],'k',observe_t, observe_X[:,2],'-',t_test, yhat[:,2],'--')
+plt.plot(t_test,x_true[:,3],'k',observe_t, observe_X[:,3],'-',t_test, yhat[:,3],'--')
+plt.legend(['I1 train','I1 true','I1 pred','I2 train','I2 true','I2 pred','I3 train','I3 true','I3 pred'])
+plt.ylabel('Population fraction')
+plt.xlabel('Days')
 plt.title('Training data vs. PINN solution')
-plt.xlim(90,200)
+plt.xlim(0,tfinal)
+tikzplotlib.save("S3I3R_const_v3_I123.tex")
 plt.show()
+
