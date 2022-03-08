@@ -8,6 +8,7 @@ Created on Fri Oct  1 00:17:49 2021
 import matplotlib.pyplot as plt
 import numpy as np
 import get_synth_data as gsd
+import tikzplotlib
 import paramest_functions_OLS as pest_OLS
 from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
@@ -15,7 +16,7 @@ from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSqu
 
 
 #initialise duration of simulation
-simdays = 150
+simdays = 70
 t1 = 0
 t2 = t1+simdays
 
@@ -26,8 +27,8 @@ overshoot = 4 #the amount of previous days included for parameter estimations in
 
 
 #initialize IC and parameters for the syntetic data
-X0 = [9.99999833e-01, 1.66666667e-07, 0.00000000e+00] #initial conditions
-beta= 0.5  #rate of transmission
+X0 = [1-0.005, 0.005, 0.00000000e+00] #initial conditions
+beta= 0.4  #rate of transmission
 gamma = 1/3     #rate of recovery
 noise_var = 0 #variance of added noise
 
@@ -61,7 +62,7 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
 #real time paramaters using PINNS
 mp_pinn = np.zeros((147,2))
 
-fname = "pinn_params_SIR"
+fname = "pinn_params_SIR3"
 file = open(fname+".out",'r')
 k = 0
 for line in file.readlines():
@@ -75,25 +76,34 @@ X_pinn = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_pinn, model=SIR, 
 
 
 #plots
-n = 5
-fig, ax = plt.subplots()
-ax2 = ax.twinx()
-ax.plot(t,X_syn[:,1])
-ax.scatter(t[overshoot::n],X_ols[::n,1])
-#ax.scatter(t[overshoot::n],X_pinn[::n,1])
-ax.legend(["I","I_OLS"],loc="upper left")
+n = 1
+#S
+plt.scatter(t[overshoot::n],X_ols[::n,0])
+plt.plot(t,X_syn[:,0])
+#I
+plt.scatter(t[overshoot::n],X_ols[::n,1])
+plt.plot(t,X_syn[:,1])
+#R
+plt.scatter(t[overshoot::n],X_ols[::n,2])
+plt.plot(t,X_syn[:,2])
+plt.ylabel('Persons/Population')
+plt.xlabel('Time [days]')
+plt.legend(['$S_{data}$','$I_{data}$','$R_{data}$','$S_{est}$','$I_{est}$','$R_{est}$'])
+tikzplotlib
+plt.show()
 
-if include_params:
-    ax2.scatter(t[::n],mp_est[::n,0], c = "r")
-    ax2.scatter(t[::n],mp_pinn[::n,0], c = "r")
-    ax2.scatter(t[::n],mp_est[::n,1], c = "tab:purple")
-    if over_time:
-        ax2.plot(t,mp[:,0],c = "r")
-        ax2.plot(t,mp[:,1],c = "tab:purple")
-    else:
-       ax2.plot(t,beta*np.ones(len(t)),"--",c = "r")
-       ax2.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
-    ax2.set_ylim(0.3,0.6)
-    ax2.legend(["b OLS","g OLS","b true", "g true"],loc = "upper right")
+#parameter plot
+if over_time:
+    plt.plot(t,mp[:,0],c = "r")
+    plt.plot(t,mp[:,1],c = "tab:purple")
+else:
+    plt.plot(t,beta*np.ones(len(t)),"--",c = "r")
+    plt.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
+plt.plot(t,mp_pinn[:,0],c = "r",marker ='o',linestyle='None')
+plt.plot(t,mp_pinn[:,1],c = "tab:purple",marker = 'o', linestyle='None')
+plt.ylim((0.2,0.6))
+plt.xlabel('Time [days]')
+plt.legend([r'$\beta_{data}$',r'$\gamma_{data}$',r'$\beta_{est}$',r'$\gamma_{est}$'])
+plt.show()
 
 

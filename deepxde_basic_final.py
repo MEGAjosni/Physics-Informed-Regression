@@ -22,6 +22,7 @@ from deepxde.backend import tf
 
 import numpy as np
 from scipy.integrate import odeint
+import tikzplotlib
 
 # SIR model parameters
 tfinal = 80   # compute ground truth
@@ -30,8 +31,8 @@ b=0.5
 k=1/3
 
 # parameters to be identified
-C1 = tf.Variable(b)
-C2 = tf.Variable(k)
+C1 = tf.Variable(1.0)
+C2 = tf.Variable(1.0)
 
 C1true = b
 C2true = k
@@ -113,14 +114,14 @@ model.compile("adam", lr=0.001)
 #model.save(getcwd())
 
 # callbacks for storing results, and outputting the values of C1, C2 subject to parameter estimation (model calibration)
-fnamevar = "variables_SIR.dat"
+fnamevar = "variables_SIR_temp.dat"
 variable = dde.callbacks.VariableValue(
     [C1,C2], 
     period=1,
     filename=fnamevar
 )
 
-losshistory, train_state = model.train(epochs=20000, callbacks=[variable])
+losshistory, train_state = model.train(epochs=70000, callbacks=[variable])
 
 # reopen saved data using callbacks in fnamevar 
 lines = open(fnamevar, "r").readlines()
@@ -130,13 +131,17 @@ Chat = np.array([np.fromstring(min(re.findall(re.escape('[')+"(.*?)"+re.escape('
 
 l,c = Chat.shape
 
-plt.plot(range(l),Chat[:,0],'r-')
-plt.plot(range(l),Chat[:,1],'k-')
-plt.plot(range(l),np.ones(Chat[:,0].shape)*C1true,'r--')
-plt.plot(range(l),np.ones(Chat[:,1].shape)*C2true,'k--')
+n = 500
+epoch = np.arange(0,l)
+plt.plot(epoch[::n],Chat[::n,0],'r-')
+plt.plot(epoch[::n],Chat[::n,1],'k-')
+plt.plot(epoch[::n],np.ones(Chat[::n,0].shape)*C1true,'r--')
+plt.plot(epoch[::n],np.ones(Chat[::n,1].shape)*C2true,'k--')
 plt.legend(['C1hat','C2hat','True C1','True C2'],loc = "right")
 plt.xlabel('Epoch')
+tikzplotlib.save("SIR_const_v1_params.tex")
 plt.show()
+
 
 yhat = model.predict(t_test)
 
@@ -145,4 +150,5 @@ plt.ylabel('Persons/Population')
 plt.xlabel('Time [days]')
 plt.legend(['$S_{true}$','$I_{true}$','$R_{true}$','$S_{data}$','$I_{data}$','$R_{data}$','$S_h$','$I_h$','$R_h$'])
 plt.title('Training data vs. PINN solution')
+tikzplotlib.save("SIR_const_v1.tex")
 plt.show()
