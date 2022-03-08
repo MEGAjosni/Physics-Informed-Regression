@@ -49,7 +49,7 @@ theta_var = tf.Variable(1.0)
 # Generate true solution
 dt = .25 # time step
 t_true = np.arange(0, tfinal, dt)
-x0_train = [0.999,0.001,0.0,0.0,0.0,0.0,0.0] # Initial condition
+x0_train = [0.9999,0.0001,0.0,0.0,0.0,0.0,0.0] # Initial condition
 x_true = sf.SimulateModel(t_true, x0_train, mp,model=models.S3I3R) # why compute here, when overriding below?
 
 # Generate data 
@@ -160,18 +160,24 @@ Chat = np.array([np.fromstring(min(re.findall(re.escape('[')+"(.*?)"+re.escape('
 l,c = Chat.shape
 
 
+Chat_scale = np.array([Chat[0]])
+for ind,val in enumerate(Chat):
+    if ind%100==0 and ind!=0:
+        print(val)
+        Chat_scale = np.append(Chat_scale,np.array([val]),axis=0)
+
 # plot parameter convergance by epoch
-plt.plot(range(l),Chat[:,0],'r-')
-plt.plot(range(l),Chat[:,1],'k-')
-plt.plot(range(l),Chat[:,2],'b-')
-plt.plot(range(l),Chat[:,3],'y-')
-plt.plot(range(l),np.ones(Chat[:,0].shape)*beta,'r--')
-plt.plot(range(l),np.ones(Chat[:,1].shape)*phi1,'k--')
-plt.plot(range(l),np.ones(Chat[:,2].shape)*phi2,'g--')
-plt.plot(range(l),np.ones(Chat[:,3].shape)*theta,'y--')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,0],'r-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,1],'k-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,2],'b-')
+plt.plot(range(len(Chat_scale)),Chat_scale[:,3],'y-')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,0].shape)*beta,'r--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,1].shape)*phi1,'k--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,2].shape)*phi2,'g--')
+plt.plot(range(len(Chat_scale)),np.ones(Chat_scale[:,3].shape)*theta,'y--')
 plt.legend(['beta est','phi1 est','phi2 est', 'theta est','beta','phi1','phi2','theta'])
 plt.xlabel('Epoch')
-tikzplotlib.save("S3I3R_const_v1_params.tex")
+tikzplotlib.save("S3I3R_const_v3_params.tex")
 plt.show()
 
 
@@ -186,6 +192,6 @@ plt.ylabel('Population fraction')
 plt.xlabel('Days')
 plt.title('Training data vs. PINN solution')
 plt.xlim(0,tfinal)
-tikzplotlib.save("S3I3R_const_v1_I123.tex")
+tikzplotlib.save("S3I3R_const_v3_I123.tex")
 plt.show()
 

@@ -48,6 +48,55 @@ def SIR(t, x, mp, matrix=False):
     
     return dXdt
 
+# %%
+'''
+###############################################
+###### >>>>> Dark number SIR model <<<<< ######
+###############################################
+'''
+def DarkNumberSIR(t, x, mp, matrix=False):
+    '''
+    Parameters
+    ----------
+    t : list
+        Sample times - Only specified by ode solver.
+        Prototype: t = [t1, t2, ..., tn]
+    x : list
+        State of the model.
+        Prototype: x = [S, I1, I2, R].
+    mp: list
+        Parameters of the model.
+        Prototype: mp = [beta, gamma].
+    matrix : Boolean, optional
+        If true, returns system matrix. The default is False.
+
+    Returns
+    -------
+    np.array
+        Default, dxdt.
+
+    '''
+
+    # Compute the total population
+    N = sum(x) # S + I + R
+    
+    # Construct system matrix from model    
+    A = np.array([
+         [-(x[1]+x[2])*x[0]/N,     0],
+         [x[1]*x[0]/N,   -x[1]],
+         [x[2]*x[0]/N,   -x[2]],
+         [0,              x[1]]
+        ])
+
+    # Return A if desired
+    if matrix:
+        return A
+    
+    # Compute dxdt.    
+    dXdt = np.array(A) @ np.array(mp).T
+    
+    return dXdt
+
 
 # %%
 '''

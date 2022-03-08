@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Fri Oct  1 00:17:49 2021
@@ -10,6 +11,7 @@ import numpy as np
 import get_synth_data as gsd
 import tikzplotlib
 import paramest_functions_OLS as pest_OLS
+import scipy.integrate
 from models import SIR, S3I3R, TripleRegionSIR
 from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSquares
 
@@ -43,12 +45,23 @@ pass_gamma = None #"None" if you need a gamma estimation, otherwise put a "gamma
 include_params = True #include parameters in plot
 
 
-
 #Generate synthetic data or use real data
 
-mp = np.array([[0.05*np.sin(2*np.pi/simdays*i)+beta,gamma] for i in range(simdays)])
+#mp = np.array([[0.05*np.sin(4*np.pi/simdays*i)+beta,gamma] for i in range(simdays)])
 
-X_syn = SimulateModel2(t, X0, mp, model=SIR, realtime=over_time)
+#X_syn = SimulateModel2(t, X0, mp, model=SIR, realtime=over_time)
+
+from data_functions import ReadDataFromCsvFile, ExtractContries, SIRdataframe, getPopulation, GetCountryCode, DownloadData
+
+
+data, date_dict, WHOregion_dict = ReadDataFromCsvFile("Covid19_data_daily_by_country.csv")
+country = GetCountryCode('Denmark')
+dataDK = ExtractContries(data, country)
+SIRdata = SIRdataframe(dataDK, N = 5800000, dark_number_scalar = 1, standardize=False)
+X_syn = SIRdata.to_numpy()
+
+day0 = 619
+X_syn = X_syn[day0:day0+simdays]
 
 
     #real time parameters using OLS
@@ -60,7 +73,7 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
         beta = pass_beta,
         gamma = pass_gamma)
 #real time paramaters using PINNS
-mp_pinn = np.zeros((147,2))
+mp_pinn = np.zeros((simdays-1,2))
 
 fname = "pinn_params_SIR3"
 file = open(fname+".out",'r')
@@ -74,6 +87,34 @@ X_ols = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, re
 X_pinn = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_pinn, model=SIR, realtime=over_time)
 
 
+# monte carlo
+T_train = 7               # Number of days used to estimate beta.
+T_proj = 100                 # Number of days to project forward from t0.
+T_samp = 7                  # Number of proceeding timesteps of t0 for which beta should be sampled.
+gamma = 1/9                 # Gamma is assumed constant.
+n_mc = 1000
+         # Number of random samples to make.:
+
+betas = mp_est[simdays-T_samp:,0]
+mu = np.mean(betas)
+sigma = np.std(betas)
+
+# Pick out n_mc random samples
+mc_betas = np.random.normal(mu, sigma, n_mc)
+
+# Simulate each sample
+ts = np.arange(simdays, simdays + T_proj + 1)
+mc_sims = np.empty((T_proj + 1, n_mc))
+
+for idx, beta in enumerate(mc_betas):
+    mc_sims[:, idx] = SimulateModel2(ts, X_syn[simdays-1,:], [beta, gamma], realtime = False)[:, 1]
+
+mu_sim = np.mean(mc_sims, axis=1)
+std_sim = np.std(mc_sims, axis=1)
+t0  =simdays
+
+CI_colors = ['darkslateblue', 'slateblue', 'mediumslateblue']
+CI_style = '--'
 
 #plots
 n = 1
@@ -105,5 +146,3 @@ plt.ylim((0.2,0.6))
 plt.xlabel('Time [days]')
 plt.legend([r'$\beta_{data}$',r'$\gamma_{data}$',r'$\beta_{est}$',r'$\gamma_{est}$'])
 plt.show()
-
-

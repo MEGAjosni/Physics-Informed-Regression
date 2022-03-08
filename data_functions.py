@@ -119,7 +119,7 @@ def SIRdataframe(
     
     # Import relevant packages
     import pandas as pd
-        
+    
     SIR_data = pd.DataFrame()
     # SIR_data = pd.DataFrame((dataframe['Date_reported']))
     
@@ -127,7 +127,8 @@ def SIRdataframe(
     SIR_data['S'] = N - (dataframe['New_cases'].cumsum() * dark_number_scalar)
     SIR_data['I'] = dataframe['New_cases'].rolling(min_periods=1, window=int(1/gamma)).sum().astype('int64') * dark_number_scalar
     SIR_data['R'] = N - (SIR_data['S'] + SIR_data['I'])
-     
+    
+    # Standardize data to mean 0 and std 1
     if standardize:
         SIR_data = (SIR_data - SIR_data.mean())/SIR_data.std()
     
