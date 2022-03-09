@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Fri Oct  1 00:17:49 2021
@@ -7,6 +8,8 @@ Created on Fri Oct  1 00:17:49 2021
 
 import matplotlib.pyplot as plt
 import numpy as np
+import get_synth_data as gsd
+import tikzplotlib
 import paramest_functions_OLS as pest_OLS
 import scipy.integrate
 from models import SIR, S3I3R, TripleRegionSIR
@@ -15,7 +18,7 @@ from sim_functions import SimulateModel2, LeastSquareModel, NoneNegativeLeastSqu
 
 
 #initialise duration of simulation
-simdays = 100
+simdays = 70
 t1 = 0
 t2 = t1+simdays
 
@@ -26,8 +29,8 @@ overshoot = 4 #the amount of previous days included for parameter estimations in
 
 
 #initialize IC and parameters for the syntetic data
-X0 = [1-0.005, 0.005, 0.0] #initial conditions
-beta= 0.5  #rate of transmission
+X0 = [1-0.005, 0.005, 0.00000000e+00] #initial conditions
+beta= 0.4  #rate of transmission
 gamma = 1/3     #rate of recovery
 noise_var = 0 #variance of added noise
 
@@ -72,7 +75,7 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
 #real time paramaters usinxg PINNS
 mp_pinn = np.zeros((simdays-1,2))
 
-fname = "pinn_params_SIR"
+fname = "pinn_params_SIR3"
 file = open(fname+".out",'r')
 k = 0
 for line in file.readlines():
@@ -91,12 +94,12 @@ T_samp = 7                  # Number of proceeding timesteps of t0 for which bet
 gamma = 1/9                 # Gamma is assumed constant.
 n_mc = 1000
          # Number of random samples to make.:
-             
+
 betas = mp_est[simdays-T_samp:,0]
 mu = np.mean(betas)
 sigma = np.std(betas)
 
-# Pick out n_mc random samples 
+# Pick out n_mc random samples
 mc_betas = np.random.normal(mu, sigma, n_mc)
 
 # Simulate each sample
@@ -115,18 +118,31 @@ CI_style = '--'
 
 #plots
 n = 1
-fig, ax = plt.subplots()
-ax2 = ax.twinx()
-ax.plot(t,X_syn[:,1])
-ax.scatter(t[overshoot::n],X_ols[::n,1], marker = '+', c = "b")
+#S
+plt.scatter(t[overshoot::n],X_ols[::n,0])
+plt.plot(t,X_syn[:,0])
+#I
+plt.scatter(t[overshoot::n],X_ols[::n,1])
+plt.plot(t,X_syn[:,1])
+#R
+plt.scatter(t[overshoot::n],X_ols[::n,2])
+plt.plot(t,X_syn[:,2])
+plt.ylabel('Persons/Population')
+plt.xlabel('Time [days]')
+plt.legend(['$S_{data}$','$I_{data}$','$R_{data}$','$S_{est}$','$I_{est}$','$R_{est}$'])
+tikzplotlib
+plt.show()
 
-for idx, color in reversed(list(enumerate(CI_colors, 1))):
-    ax.fill_between(ts, mu_sim - idx * std_sim, mu_sim + idx * std_sim, color=color, alpha=1)
-#if include_params:
-ax.legend(['I_data','I_OLS,', '99.7% Confidence Interval', '95% Confidence Interval', '68.2% Confidence Interval'],loc="upper left")
-ax2.scatter(t[::],mp_est[::,0], c = "r")
-
-ax2.set_ylim(0.05,0.3)
-ax2.legend(["b OLS","g OLS","b true", "g true"],loc = "upper right")
-
-
+#parameter plot
+if over_time:
+    plt.plot(t,mp[:,0],c = "r")
+    plt.plot(t,mp[:,1],c = "tab:purple")
+else:
+    plt.plot(t,beta*np.ones(len(t)),"--",c = "r")
+    plt.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
+plt.plot(t,mp_pinn[:,0],c = "r",marker ='o',linestyle='None')
+plt.plot(t,mp_pinn[:,1],c = "tab:purple",marker = 'o', linestyle='None')
+plt.ylim((0.2,0.6))
+plt.xlabel('Time [days]')
+plt.legend([r'$\beta_{data}$',r'$\gamma_{data}$',r'$\beta_{est}$',r'$\gamma_{est}$'])
+plt.show()

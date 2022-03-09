@@ -215,7 +215,7 @@ for i in range(len(varying_params_est)):
     beta_est[i] = (varying_params_est[i])[0]
     phi1_est[i] = (varying_params_est[i])[1]
     phi2_est[i] = (varying_params_est[i])[2]
-    theta_est[i] = (varying_params_est[i])[3]
+    theta_est[i] = (varying_params_est[i])[3]   
 
 
 fig = plt.figure()

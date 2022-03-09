@@ -9,6 +9,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import tensorflow as tf
 import io
 import re
@@ -19,6 +20,7 @@ import requests
 from tempfile import TemporaryFile
 import deepxde as dde
 from deepxde.backend import tf
+import tikzplotlib
 
 import numpy as np
 from scipy.integrate import odeint
@@ -157,7 +159,7 @@ for day in range(1,simdays):
     print("----   Estimated -- Actual avg")
     print("beta  ",Chat[train_state.best_step][0],"     ",avg_beta)
     print("gamma ",Chat[train_state.best_step][1],"     ",avg_gamma)
-    #print(mp_day)
+    #print(mp_day)   
     
 # save estimated parameters    
 np.savetxt('pinn_params_SIR3.out',varying_params_est,delimiter = ',')
@@ -179,10 +181,11 @@ plt.legend(['beta','gamma','beta est', 'gamma est'],loc='upper right')
 plt.title('estimating varying parameters, 4 day training per day')
 plt.xlabel('day')
 plt.ylim((0.2,0.6))
+tikzplotlib.save("SIR_varying_v1_params.tex")
 plt.show()
 
 # plot prediction vs true data (true being data created with target parameters)
-x_pred = SimulateModel2(t_params, x0_train, varying_params_est, model = SIR, realtime=(True))
+x_pred = SimulateModel2(t_params, x_true[0,:], varying_params_est, model = SIR, realtime=(True))
 
 plt.scatter(t_params,x_pred[:,1])
 plt.plot(t_true,x_true[:,1])
