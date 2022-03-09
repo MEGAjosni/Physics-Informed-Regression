@@ -7,7 +7,6 @@ Created on Thu Sep 30 21:01:02 2021
 
 import statistics
 import numpy as np
-import tqdm
 
 def SIR_params_OLS(
         t1: int,  # Start: index for first entry included from X

@@ -22,7 +22,7 @@ t2 = t1+simdays
 
 ############ Real time estimations ################################
 over_time = True #set "True" if estimations are needed in real time
-overshoot = 4 #the amount of previous days included for parameter estimations in real time
+overshoot = 1 #the amount of previous days included for parameter estimations in real time
 
 
 #initialize IC and parameters for the syntetic data
@@ -44,11 +44,23 @@ include_params = True #include parameters in plot
 
 
 #Customize function for beta
-def beta_sincurve(t,beta):
+def betacurve1(t,beta):
     return 0.05*np.sin(2*np.pi/simdays*t)+beta
 
+def betacurve2(t,beta):
+    if t < simdays/2:
+        return 2*beta/simdays*t
+    else:
+        return beta
+    
+def betacurve3(t,beta):
+    if t < simdays/2:
+        return beta/2
+    else:
+        return beta*3/2
+
 #Generate synthetic data
-mp = np.array([[beta_sincurve(i,beta),gamma] for i in range(simdays)])
+mp = np.array([[betacurve3(i,beta),gamma] for i in range(simdays)])
 
 
 X_syn = SimulateModel2(t, X0, mp, model=SIR, realtime=True)   
@@ -81,8 +93,8 @@ plt.plot(t[::n],mp_est[::n,:],'o',label = [r"$\hat{\beta}$","$\hat{\gamma}$"])
 #plt.plot(t[:-1],mp_pinn,'o',)
 plt.plot(t,mp,label = [r"$\beta$","$\gamma$"])
 plt.legend()
-plt.ylim(0.2,0.6)
-save("PIR_SIR_synt_vary_params.tex")
+plt.ylim(0,1)
+#save("PIR_SIR_synt_vary_params.tex")
 plt.show()
 
 #%% S3I3R
@@ -90,7 +102,7 @@ plt.show()
 simdays = 28*2
 t1 = 0
 t2 = t1+simdays
-overshoot = 7
+overshoot = 1
 
 beta = 0.5
 gamma1 = 1/3 

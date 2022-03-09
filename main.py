@@ -69,7 +69,7 @@ mp_est = pest_OLS.SIR_params_over_time_OLS(
         X = X_syn,
         beta = pass_beta,
         gamma = pass_gamma)
-#real time paramaters using PINNS
+#real time paramaters usinxg PINNS
 mp_pinn = np.zeros((simdays-1,2))
 
 fname = "pinn_params_SIR"
@@ -117,10 +117,8 @@ CI_style = '--'
 n = 1
 fig, ax = plt.subplots()
 ax2 = ax.twinx()
-#ax.plot(ts, mc_sims, color='royalblue')
 ax.plot(t,X_syn[:,1])
 ax.scatter(t[overshoot::n],X_ols[::n,1], marker = '+', c = "b")
-#ax.scatter(t[overshoot::n],X_pinn[::n,1], marker = 'x', c = "b")
 
 for idx, color in reversed(list(enumerate(CI_colors, 1))):
     ax.fill_between(ts, mu_sim - idx * std_sim, mu_sim + idx * std_sim, color=color, alpha=1)
@@ -128,14 +126,6 @@ for idx, color in reversed(list(enumerate(CI_colors, 1))):
 ax.legend(['I_data','I_OLS,', '99.7% Confidence Interval', '95% Confidence Interval', '68.2% Confidence Interval'],loc="upper left")
 ax2.scatter(t[::],mp_est[::,0], c = "r")
 
- #ax2.scatter(t[::n],mp_pinn[::n,0], c = "r", marker = 'x')
- #x2.scatter(t[:-1],mp_pinn[::n,1], c = "tab:purple")
- #if over_time:
- #ax2.plot(t,mp[:,0],c = "r")
- #ax2.plot(t,mp[:,1],c = "tab:purple")
-# else:
-#ax2.plot(t,beta*np.ones(len(t)),"--",c = "r")
-#ax2.plot(t,gamma*np.ones(len(t)),"--",c = "tab:purple")
 ax2.set_ylim(0.05,0.3)
 ax2.legend(["b OLS","g OLS","b true", "g true"],loc = "upper right")
 

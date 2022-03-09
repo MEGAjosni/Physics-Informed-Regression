@@ -82,12 +82,8 @@ def DarkNumberSIR(t, x, mp, matrix=False):
     
     # Construct system matrix from model    
     A = np.array([
-         [-(x[1]+x[2])*x[0]/N,     0],
-         [x[1]*x[0]/N,   -x[1]],
-         [x[2]*x[0]/N,   -x[2]],
-         [0,              x[1]]
+        -x[1]*x[0]/N,0
         ])
-
     # Return A if desired
     if matrix:
         return A
@@ -258,3 +254,5 @@ def MultivariantSIR(t, x, mp, matrix=False):
     dxdt = np.array(A) @ np.array(mp).T
     
     return dxdt
+
+#%% 
