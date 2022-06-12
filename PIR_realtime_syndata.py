@@ -2,6 +2,8 @@
 """
 Created on Sun Dec 26 17:50:21 2021
 
+
+
 @author: Marcu
 """
 
@@ -21,7 +23,6 @@ t2 = t1+simdays
 
 
 ############ Real time estimations ################################
-over_time = True #set "True" if estimations are needed in real time
 overshoot = 1 #the amount of previous days included for parameter estimations in real time
 
 
@@ -32,11 +33,6 @@ gamma = 1/3     #rate of recovery
 noise_var = 0 #variance of added noise
 
 t = np.arange(simdays)
-
-############ Which parameters to find ####################################
-pass_beta = None #"None" if you need a beta estimation, otherwise put a "beta" value
-pass_gamma = None #"None" if you need a gamma estimation, otherwise put a "gamma" value
-
 
 #### plots ##############
 include_params = True #include parameters in plot
@@ -59,21 +55,25 @@ def betacurve3(t,beta):
     else:
         return beta*3/2
 
-#Generate synthetic data
+#Generate synthetic parameters. Use betacurve1 2 or 3
 mp = np.array([[betacurve3(i,beta),gamma] for i in range(simdays)])
 
-
+#Generate data from synthetic parameters
 X_syn = SimulateModel2(t, X0, mp, model=SIR, realtime=True)   
 
-    #real time parameters using OLS
+    #real time parameter reconstruction using OLS
 mp_est = pest_OLS.SIR_params_over_time_OLS(
         t1 = t1,
         t2 = t2,
         overshoot = overshoot,
-        X = X_syn,
-        beta = pass_beta,
-        gamma = pass_gamma)
+        X = X_syn)
+
+#simulation using retrieved parameters
+X_ols = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, realtime=True)
+
+"""
 #real time paramaters using PINNS
+
 mp_pinn = np.zeros((simdays-1,2))
 
 fname = "pinn_params_SIR2"
@@ -82,12 +82,12 @@ k = 0
 for line in file.readlines():
     mp_pinn[k] = line.split(",")
     k+= 1
-
-#simulation using retrieved parameters
-X_ols = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_est, model=SIR, realtime=over_time)
+    
 X_pinn = SimulateModel2(t[overshoot:], X_syn[overshoot, :], mp_pinn, model=SIR, realtime=over_time)
+    """
 
 
+#Visualization of parameters
 n=1
 plt.plot(t[::n],mp_est[::n,:],'o',label = [r"$\hat{\beta}$","$\hat{\gamma}$"])
 #plt.plot(t[:-1],mp_pinn,'o',)
@@ -118,6 +118,7 @@ def beta_sincurve(t,beta):
     return 0.05*np.sin(2*np.pi/simdays*t)+beta
 t= np.arange(0, simdays)
 
+#Generate synthetic parameters. Use betacurve1 2 or 3
 mp  = np.vstack([0.05*np.sin(2*np.pi/simdays*t)+beta,
                   gamma1*np.ones(len(t)),
                   gamma2*np.ones(len(t)),
@@ -128,9 +129,10 @@ mp  = np.vstack([0.05*np.sin(2*np.pi/simdays*t)+beta,
                   tau*np.ones(len(t))]).T
 
 
-
+#Generate data from synthetic parameters
 X_syn = SimulateModel2(t, X0, mp, model=S3I3R, realtime=True)
 
+#Recreate parameters using OLS
 mp_est = pest_OLS.params_over_time_expanded_LA(
         t1 = t1 ,
         t2 = t2,
@@ -139,6 +141,9 @@ mp_est = pest_OLS.params_over_time_expanded_LA(
         mp = np.array([gamma1,gamma2,gamma3])
         )
 
+"""
+## Get PINN data, if it is desired
+
 mp_pinn = np.zeros((simdays-1,4))
 fname = "varying_parameters_S3I3R_v5"
 file = open(fname+".out",'r')
@@ -146,8 +151,10 @@ k = 0
 for line in file.readlines():
     mp_pinn[k] = line.split(",")
     k+= 1
+"""
 
 
+#Visualization
 plt.plot(np.arange(simdays+1),mp_est.T,'o',label = [r"$\hat{\beta}$","$\hat{\phi}_1$","$\hat{\phi}_2$","$\hat{\theta}$"])
 plt.plot(np.arange(simdays),[[beta_sincurve(i,beta),phi1,phi2,theta] for i in range(simdays)],'-', label=[r"$\beta$","$\phi_1$","$\phi_2$","$\theta$"])
 plt.legend()
