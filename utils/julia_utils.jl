@@ -18,7 +18,9 @@ function noise_v_collocation_points(
                                 noise_vals::Vector{Float64},# Noise levels to test
                                 n_data_points::Vector{Int}, # Number of data points to select from the solution
                                 n_iter::Int = 20,# Number of iterations for averaging the estimates
-                                ) 
+                                p = 0 # Parameters of the ODE system
+                                )
+    max_u_val = maximum(abs.(hcat(sol.u...)), dims=2)
     total_n_data_points = length(sol.t)
     for noise in noise_vals
         for n_data_points in n_data_points
