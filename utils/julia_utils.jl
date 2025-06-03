@@ -1,3 +1,4 @@
+using DataFrames
 """
     noise_v_collocation_points(sys, sol, noise_vals, n_data_points, n_iter)
 Estimate parameters of an ODE system using Physics-Informed Regression with varying noise levels and data points.
@@ -13,15 +14,16 @@ This function takes an ODE system, a solution object or dictionary of solutions,
 - `Dict{Tuple, Vector}`: A dictionary containing the relative errors of the estimated parameters for each combination of noise level and number of data points.
 """
 function noise_v_collocation_points(
-                                sys::ODESystem, # ODE system
-                                sol::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
-                                noise_vals::Vector{Float64},# Noise levels to test
-                                n_data_points::Vector{Int}, # Number of data points to select from the solution
+                                sys,#::ODESystem, # ODE system
+                                sol,#::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
+                                noise_vals::Vector,# Noise levels to test
+                                n_data_points::Vector, # Number of data points to select from the solution
                                 n_iter::Int = 20,# Number of iterations for averaging the estimates
-                                p = 0 # Parameters of the ODE system
+                                p = Dict() # Parameters of the ODE system
                                 )
     max_u_val = maximum(abs.(hcat(sol.u...)), dims=2)
     total_n_data_points = length(sol.t)
+    rel_errors = Dict{Tuple{Int,Float64}, Vector{Float64}}()
     for noise in noise_vals
         for n_data_points in n_data_points
             # Select a subset of the solution
@@ -49,29 +51,30 @@ function noise_v_collocation_points(
             relative_errors = [abs.((param_ests[i] - p[parameters(sys)[i]]) / p[parameters(sys)[i]]) for i in 1:length(parameters(sys))]
 
             # Store the estimates
-            parameter_estimates[(n_data_points,noise)] = relative_errors
+            rel_errors[(n_data_points,noise)] = relative_errors
         end
     end
-    return parameter_estimates
+    return rel_errors
 end
 
 
+
 """
-    create_table(parameter_estimates::Dict{Tuple, Vector}) -> DataFrame
+    create_table(rel_errors::Dict{Tuple, Vector}) -> DataFrame
 
 Create a DataFrame from the parameter estimates dictionary, organizing the relative errors of the estimated parameters by noise level and number of data points.
 # Args:
-- `parameter_estimates`::Dict{Tuple, Vector}: A dictionary where keys are tuples of (number of data points, noise level) and values are vectors of relative errors for the estimated parameters.
+- `rel_errors`::Dict{Tuple, Vector}: A dictionary where keys are tuples of (number of data points, noise level) and values are vectors of relative errors for the estimated parameters.
 # Returns:
 - `DataFrame`: A DataFrame with rows corresponding to the number of data points and columns corresponding to different noise levels, containing the relative errors of the estimated parameters.
 """
-function create_table(parameter_estimates::Dict{Tuple, Vector})
+function create_table(rel_errors; parameter_idx = 1)
     # Collect unique values for rows and columns
-    n_data_points_vals = sort(unique([k[1] for k in keys(parameter_estimates)]))
-    noise_vals = sort(unique([k[2] for k in keys(parameter_estimates)]))
+    n_data_points_vals = sort(unique([k[1] for k in keys(rel_errors)]))
+    noise_vals = sort(unique([k[2] for k in keys(rel_errors)]))
 
     # Build a matrix of relative errors for α
-    err_matrix = round.([parameter_estimates[(n, noise)][4] for n in n_data_points_vals, noise in noise_vals]*100, sigdigits=4)
+    err_matrix = round.([rel_errors[(n, noise)][parameter_idx ] for n in n_data_points_vals, noise in noise_vals]*100, sigdigits=4)
 
     # Create DataFrame
     df = DataFrame(err_matrix, :auto)
