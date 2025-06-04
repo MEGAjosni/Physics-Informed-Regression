@@ -11,19 +11,19 @@ This function takes an ODE system, a solution object or dictionary of solutions,
 - `n_data_points`::Vector{Int}: A vector of the number of data points to select from the solution.
 - `n_iter`::Int: The number of iterations for averaging the estimates (default is 20).
 # Returns: \n
-- `Dict{Tuple, Vector}`: A dictionary containing the relative errors of the estimated parameters for each combination of noise level and number of data points.
+- `Dict{Tuple, Vector}`: A dictionary containing the parameters for each combination of noise level and number of data points.
 """
 function noise_v_collocation_points(
                                 sys,#::ODESystem, # ODE system
                                 sol,#::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
                                 noise_vals::Vector,# Noise levels to test
-                                n_data_points::Vector, # Number of data points to select from the solution
+                                n_data_points::Vector; # Number of data points to select from the solution
                                 n_iter::Int = 20,# Number of iterations for averaging the estimates
-                                p = Dict() # Parameters of the ODE system
                                 )
     max_u_val = maximum(abs.(hcat(sol.u...)), dims=2)
     total_n_data_points = length(sol.t)
-    rel_errors = Dict{Tuple{Int,Float64}, Vector{Float64}}()
+    u0 = sol.u[1,:] # Initial condition
+    parameter_estimates = Dict{Tuple{Int,Float64}, Vector{Float64}}()
     for noise in noise_vals
         for n_data_points in n_data_points
             # Select a subset of the solution
@@ -48,13 +48,13 @@ function noise_v_collocation_points(
             param_ests ./= n_iter # Average the estimates over the 20 iterations
 
             #compute relative error for each parameter
-            relative_errors = [abs.((param_ests[i] - p[parameters(sys)[i]]) / p[parameters(sys)[i]]) for i in 1:length(parameters(sys))]
+            #relative_errors = [abs.((param_ests[i] - p[parameters(sys)[i]]) / p[parameters(sys)[i]]) for i in 1:length(parameters(sys))]
 
             # Store the estimates
-            rel_errors[(n_data_points,noise)] = relative_errors
+            parameter_estimates[(n_data_points,noise)] = param_ests
         end
     end
-    return rel_errors
+    return parameter_estimates
 end
 
 
