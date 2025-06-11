@@ -1,4 +1,19 @@
 using DataFrames
+
+function noise_v_collocation_points(
+                                sys,#::ODESystem, # ODE system
+                                sol,#::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
+                                noise_vals::Vector, # Noise levels to test
+                                n_data_points::Vector; # Number of data points to select from the solution
+                                n_iter::Int = 20, # Number of iterations for averaging the estimates
+                                )
+    u = sol.u
+    t = sol.t
+
+    return noise_v_collocation_points(sys, u, t, noise_vals, n_data_points; n_iter=n_iter)
+end
+
+
 """
     noise_v_collocation_points(sys, sol, noise_vals, n_data_points, n_iter)
 Estimate parameters of an ODE system using Physics-Informed Regression with varying noise levels and data points.
@@ -15,14 +30,15 @@ This function takes an ODE system, a solution object or dictionary of solutions,
 """
 function noise_v_collocation_points(
                                 sys,#::ODESystem, # ODE system
-                                sol,#::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
+                                u::Array,#::Union{ODESolution, Dict}, # Solution object or dictionary of solutions
+                                t::Array,#::Vector{Float64}, # Time vector
                                 noise_vals::Vector,# Noise levels to test
                                 n_data_points::Vector; # Number of data points to select from the solution
                                 n_iter::Int = 20,# Number of iterations for averaging the estimates
                                 )
-    max_u_val = maximum(abs.(hcat(sol.u...)), dims=2)
-    total_n_data_points = length(sol.t)
-    u0 = sol.u[1,:] # Initial condition
+    max_u_val = maximum(abs.(hcat(u...)), dims=2)
+    total_n_data_points = length(t)
+    u0 = u[1,:] # Initial condition
     parameter_estimates = Dict{Tuple{Int,Float64}, Vector{Float64}}()
     for noise in noise_vals
         for n_data_points in n_data_points
@@ -32,8 +48,8 @@ function noise_v_collocation_points(
             for _ in 1:n_iter
                 grid_step_size = ceil(Int, total_n_data_points / n_data_points)
 
-                selected_t = sol.t[1:grid_step_size:end]
-                selected_u = (hcat(sol.u[1:grid_step_size:end, :]...)+randn(length(u0),length(selected_t)).* max_u_val .* noise)'
+                selected_t = t[1:grid_step_size:end]
+                selected_u = (hcat(u[1:grid_step_size:end, :]...)+randn(length(u0),length(selected_t)).* max_u_val .* noise)'
 
                 #reshape
                 selected_u = [selected_u[i,:] for i in 1:size(selected_u,1)]
